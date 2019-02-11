@@ -26,11 +26,16 @@
         </activity>
 
         <activity
-            android:name=".playvideo_texuture.TextureViewMediaActivity"
+            android:name=".playvideo.TextureViewMediaActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"></activity>
 
+        <activity
+            android:name=".harddecode.HardDecodePlayerActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

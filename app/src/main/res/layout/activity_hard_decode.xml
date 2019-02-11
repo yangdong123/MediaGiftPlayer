@@ -1,0 +1,23 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tv_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/f94956"
+        android:gravity="center"
+        android:text="开始,背景"
+        android:textColor="#ffffff"
+        android:textSize="60dp" />
+
+    <com.example.yangdong.mediagiftplayer.harddecode.GiftView
+        android:id="@+id/id_textureview"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_centerInParent="true" />
+
+
+</RelativeLayout>

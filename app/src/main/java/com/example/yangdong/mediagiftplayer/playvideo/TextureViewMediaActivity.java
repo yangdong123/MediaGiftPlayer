@@ -1,4 +1,4 @@
-package com.example.yangdong.mediagiftplayer.playvideo_texuture;
+package com.example.yangdong.mediagiftplayer.playvideo;
 
 import android.app.Activity;
 import android.graphics.SurfaceTexture;

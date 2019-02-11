@@ -1,4 +1,4 @@
-package com.example.yangdong.mediagiftplayer.playvideo_texuture;
+package com.example.yangdong.mediagiftplayer.playvideo;
 
 
 import android.content.Context;
@@ -9,8 +9,8 @@ import android.opengl.GLUtils;
 import android.util.Log;
 
 import com.example.yangdong.mediagiftplayer.R;
-import com.example.yangdong.mediagiftplayer.playvideo_texuture.utils.RawResourceReader;
-import com.example.yangdong.mediagiftplayer.playvideo_texuture.utils.ShaderHelper;
+import com.example.yangdong.mediagiftplayer.playvideo.utils.RawResourceReader;
+import com.example.yangdong.mediagiftplayer.playvideo.utils.ShaderHelper;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

@@ -11,7 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.yangdong.mediagiftplayer.playvideo_texuture.TextureViewMediaActivity;
+import com.example.yangdong.mediagiftplayer.harddecode.HardDecodePlayerActivity;
+import com.example.yangdong.mediagiftplayer.playvideo.TextureViewMediaActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -42,9 +43,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(this, "Play Video on TextureView", Toast.LENGTH_SHORT).show();
                 break;
 
+
             case R.id.button_hard_texture_view:
 //
+                verifyStoragePermission(this);
 
+                mIntent.setClass(this, HardDecodePlayerActivity.class);
+                startActivity(mIntent);
+                Toast.makeText(this, "Play Video on HardDecode", Toast.LENGTH_SHORT).show();
+                break;
         }
     }
 
