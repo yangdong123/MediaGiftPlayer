@@ -47,12 +47,13 @@ public class GiftViewPlayer extends FrameLayout {
         if (getChildCount() >= childViewCount) {
             return;
         }
+
+        final GiftView giftView = new GiftView(getContext());
+
         String videoPath = giftQueue.poll();
         if (videoPath == null || videoPath.length() == 0) {
             return;
         }
-
-        final GiftView giftView = new GiftView(getContext());
         giftView.setVideoPath(videoPath);
         giftView.setOnTextureListener(new GiftView.OnTextureListener() {
             @Override
@@ -74,5 +75,12 @@ public class GiftViewPlayer extends FrameLayout {
         });
 
         addView(giftView);
+    }
+
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        removeAllViews();
     }
 }

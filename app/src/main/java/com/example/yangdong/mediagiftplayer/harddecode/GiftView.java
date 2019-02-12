@@ -58,7 +58,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
 
         SurfaceTexture surfaceTexture = getSurfaceTexture();
-        videoRenderer = new VideoTextureSurfaceRenderer(getContext(), surfaceTexture, 0, 0);
+        videoRenderer = new VideoTextureSurfaceRenderer(getContext().getApplicationContext(), surfaceTexture, 0, 0);
         videoRenderer.setOnFrameAvailableListener(new VideoTextureSurfaceRenderer.OnFrameAvailableListener() {
             @Override
             public void onFrameAvailable(SurfaceTexture surfaceTexture) {
@@ -198,10 +198,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                 // All decoded frames have been rendered, we can stop playing now
                 if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                     Log.d("DecodeActivity", "OutputBuffer BUFFER_FLAG_END_OF_STREAM");
-                    isPlaying = false;
-                    if (onTextureListener != null) {
-                        onTextureListener.onCompleted();
-                    }
+
                     break;
                 }
             }
@@ -209,6 +206,13 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
             decoder.stop();
             decoder.release();
             extractor.release();
+            isPlaying = false;
+            if (onTextureListener != null) {
+                onTextureListener.onCompleted();
+                surface.release();
+                setSurfaceTextureListener(null);
+
+            }
         }
     }
 
@@ -222,5 +226,14 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
         void onCompleted();
 
         void onTextureAvailable();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (videoRenderer != null) {
+            videoRenderer.onPause();
+            videoRenderer = null;
+        }
     }
 }

@@ -23,7 +23,7 @@ import java.io.IOException;
  */
 public class TextureViewMediaActivity extends Activity implements TextureView.SurfaceTextureListener,
         MediaPlayer.OnPreparedListener,  SurfaceHolder.Callback{
-    private static final String TAG = "GLViewMediaActivity";
+    private static final String TAG = "yd";
 
     //https://s17.aconvert.com/convert/p3r68-cdx67/niqqg-461m9.gif
     public static final String videoPath = Environment.getExternalStorageDirectory().getAbsolutePath()+ File.separator+"rocket.mp4";

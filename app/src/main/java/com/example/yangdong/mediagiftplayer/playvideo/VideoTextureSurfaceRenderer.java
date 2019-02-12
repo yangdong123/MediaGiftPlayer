@@ -81,6 +81,7 @@ public class VideoTextureSurfaceRenderer extends TextureSurfaceRenderer implemen
         vTexCoordinateAlpha = GLES20.glGetAttribLocation(shaderProgram, "vTexCoordinateAlpha");
         vTexCoordinateRgb = GLES20.glGetAttribLocation(shaderProgram, "vTexCoordinateRgb");
         vPosition = GLES20.glGetAttribLocation(shaderProgram, "vPosition");
+
     }
 
     private void setupVertexBuffer() {
@@ -206,9 +207,6 @@ public class VideoTextureSurfaceRenderer extends TextureSurfaceRenderer implemen
         videoTexture = new SurfaceTexture(textures[0]);
         videoTexture.setOnFrameAvailableListener(this);
         videoTexture.setDefaultBufferSize(width, height);
-        if (onFrameAvailableListener != null) {
-            onFrameAvailableListener.onFrameAvailable(surfaceTexture);
-        }
 
         setupVertexBuffer();
         setupTexture(1);
@@ -217,7 +215,14 @@ public class VideoTextureSurfaceRenderer extends TextureSurfaceRenderer implemen
     }
 
     @Override
-    protected void deinitGLComponents() {
+    protected void initGLTexture() {
+        if (onFrameAvailableListener != null) {
+            onFrameAvailableListener.onFrameAvailable(surfaceTexture);
+        }
+    }
+
+    @Override
+    public void deinitGLComponents() {
         GLES20.glDeleteTextures(4, textures, 0);
         GLES20.glDeleteProgram(shaderProgram);
         videoTexture.release();
