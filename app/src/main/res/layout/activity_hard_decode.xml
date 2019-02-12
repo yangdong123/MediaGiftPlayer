@@ -3,15 +3,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <TextView
-        android:id="@+id/tv_background"
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/f94956"
         android:gravity="center"
-        android:text="开始,背景"
+        android:text="背景"
         android:textColor="#ffffff"
         android:textSize="60dp" />
+
+    <Button
+        android:id="@+id/bt_start_add"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:text="开始添加播放"
+        android:textColor="#ffffff"
+        android:layout_marginBottom="20dp"
+        android:textSize="10dp" />
 
     <com.example.yangdong.mediagiftplayer.harddecode.GiftViewPlayer
         android:id="@+id/id_textureview"

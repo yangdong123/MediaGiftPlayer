@@ -25,7 +25,7 @@ public class HardDecodePlayerActivity extends Activity implements View.OnClickLi
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_hard_decode);
-        findViewById(R.id.tv_background).setOnClickListener(this);
+        findViewById(R.id.bt_start_add).setOnClickListener(this);
         initView();
 
     }
@@ -56,7 +56,7 @@ public class HardDecodePlayerActivity extends Activity implements View.OnClickLi
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.tv_background:
+            case R.id.bt_start_add:
                 if (index > 3) {
                     index = 0;
                 }
