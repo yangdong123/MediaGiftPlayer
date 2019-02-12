@@ -206,6 +206,9 @@ public class VideoTextureSurfaceRenderer extends TextureSurfaceRenderer implemen
         videoTexture = new SurfaceTexture(textures[0]);
         videoTexture.setOnFrameAvailableListener(this);
         videoTexture.setDefaultBufferSize(width, height);
+        if (onFrameAvailableListener != null) {
+            onFrameAvailableListener.onFrameAvailable(surfaceTexture);
+        }
 
         setupVertexBuffer();
         setupTexture(1);
@@ -238,6 +241,7 @@ public class VideoTextureSurfaceRenderer extends TextureSurfaceRenderer implemen
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
         synchronized (this) {
             frameAvailable = true;
+
         }
     }
 
@@ -268,4 +272,13 @@ public class VideoTextureSurfaceRenderer extends TextureSurfaceRenderer implemen
         GLES20.glDisable(GLES20.GL_BLEND);
     }
 
+    private OnFrameAvailableListener onFrameAvailableListener;
+
+    public void setOnFrameAvailableListener(OnFrameAvailableListener onFrameAvailableListener) {
+        this.onFrameAvailableListener = onFrameAvailableListener;
+    }
+
+    public interface OnFrameAvailableListener {
+        void onFrameAvailable(SurfaceTexture surfaceTexture);
+    }
 }

@@ -13,7 +13,7 @@
         android:textColor="#ffffff"
         android:textSize="60dp" />
 
-    <com.example.yangdong.mediagiftplayer.harddecode.GiftView
+    <com.example.yangdong.mediagiftplayer.harddecode.GiftViewPlayer
         android:id="@+id/id_textureview"
         android:layout_width="300dp"
         android:layout_height="300dp"

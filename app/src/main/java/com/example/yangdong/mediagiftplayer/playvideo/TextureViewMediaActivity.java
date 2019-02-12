@@ -85,19 +85,15 @@ public class TextureViewMediaActivity extends Activity implements TextureView.Su
             mediaPlayer.setOnPreparedListener(this);
             mediaPlayer.setLooping(true);
         } catch (IllegalArgumentException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
             showErrorMessage(e1.getMessage());
         } catch (SecurityException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
             showErrorMessage(e1.getMessage());
         } catch (IllegalStateException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
             showErrorMessage(e1.getMessage());
         } catch (IOException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
             showErrorMessage(e1.getMessage());
         }

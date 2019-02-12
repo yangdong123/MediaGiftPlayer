@@ -6,7 +6,6 @@ import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.os.Build;
-import android.os.Environment;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -15,18 +14,20 @@ import android.view.TextureView;
 
 import com.example.yangdong.mediagiftplayer.playvideo.VideoTextureSurfaceRenderer;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
  * Created by MrDong on 2019/2/11.
  */
-public class GiftView extends TextureView implements TextureView.SurfaceTextureListener {
+public class GiftView extends TextureView implements TextureView.SurfaceTextureListener, SurfaceTexture.OnFrameAvailableListener {
 
-    public static final String videoPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "rocket.mp4";
+
+    private boolean isPlaying;
     private PlayerThread playerThread;
     private VideoTextureSurfaceRenderer videoRenderer;
+    private String videoPath;
+
 
     public GiftView(Context context) {
         this(context, null);
@@ -42,18 +43,31 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
 
     }
 
+    public void setVideoPath(String videoPath) {
+        this.videoPath = videoPath;
+    }
+
     private void init() {
         setSurfaceTextureListener(this);
         setOpaque(false);
 
-
-
     }
+
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+
         SurfaceTexture surfaceTexture = getSurfaceTexture();
         videoRenderer = new VideoTextureSurfaceRenderer(getContext(), surfaceTexture, 0, 0);
+        videoRenderer.setOnFrameAvailableListener(new VideoTextureSurfaceRenderer.OnFrameAvailableListener() {
+            @Override
+            public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+                if (onTextureListener != null) {
+                    onTextureListener.onTextureAvailable();
+                }
+            }
+        });
+
     }
 
     @Override
@@ -63,9 +77,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        if (playerThread != null) {
-            playerThread.interrupt();
-        }
+        isPlaying = false;
         return false;
     }
 
@@ -76,10 +88,15 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
 
     public void playAnim() {
 
-
+        isPlaying = true;
         Surface surface = new Surface(videoRenderer.getVideoTexture());
         playerThread = new PlayerThread(surface, videoPath);
         playerThread.start();
+    }
+
+    @Override
+    public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+
     }
 
     private class PlayerThread extends Thread {
@@ -162,7 +179,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                         break;
                     default:
                         ByteBuffer buffer = outputBuffers[outIndex];
-                        Log.v("DecodeActivity", "We can't use this buffer but render it due to the API limit, " + buffer);
+//                        Log.v("DecodeActivity", "We can't use this buffer but render it due to the API limit, " + buffer);
 
                         // We use a very simple clock to keep the video FPS, or the video
                         // playback will be too fast
@@ -181,6 +198,10 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                 // All decoded frames have been rendered, we can stop playing now
                 if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                     Log.d("DecodeActivity", "OutputBuffer BUFFER_FLAG_END_OF_STREAM");
+                    isPlaying = false;
+                    if (onTextureListener != null) {
+                        onTextureListener.onCompleted();
+                    }
                     break;
                 }
             }
@@ -189,5 +210,17 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
             decoder.release();
             extractor.release();
         }
+    }
+
+    private OnTextureListener onTextureListener;
+
+    public void setOnTextureListener(OnTextureListener onTextureListener) {
+        this.onTextureListener = onTextureListener;
+    }
+
+    interface OnTextureListener {
+        void onCompleted();
+
+        void onTextureAvailable();
     }
 }
