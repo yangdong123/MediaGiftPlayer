@@ -1,4 +1,4 @@
-package com.example.yangdong.mediagiftplayer.playvideo.utils;
+package com.example.yangdong.mediagiftplayerlibrary.utils.utils;
 
 import android.opengl.GLES20;
 import android.util.Log;

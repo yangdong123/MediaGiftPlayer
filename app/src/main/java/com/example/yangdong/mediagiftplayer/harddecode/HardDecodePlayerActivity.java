@@ -5,7 +5,8 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.example.yangdong.mediagiftplayer.R;
-import com.example.yangdong.mediagiftplayer.playvideo.utils.FileUtil;
+import com.example.yangdong.mediagiftplayerlibrary.utils.utils.FileUtil;
+import com.example.yangdong.mediagiftplayerlibrary.utils.view.GiftViewPlayer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * MediaCodec 硬解码的方式
  * Created by MrDong on 2019/2/11.
  */
 public class HardDecodePlayerActivity extends Activity implements View.OnClickListener {

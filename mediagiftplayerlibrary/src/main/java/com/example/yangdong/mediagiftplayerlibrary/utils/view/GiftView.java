@@ -1,4 +1,4 @@
-package com.example.yangdong.mediagiftplayer.harddecode;
+package com.example.yangdong.mediagiftplayerlibrary.utils.view;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
@@ -12,7 +12,7 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
 
-import com.example.yangdong.mediagiftplayer.playvideo.VideoTextureSurfaceRenderer;
+import com.example.yangdong.mediagiftplayerlibrary.utils.VideoTextureSurfaceRenderer;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

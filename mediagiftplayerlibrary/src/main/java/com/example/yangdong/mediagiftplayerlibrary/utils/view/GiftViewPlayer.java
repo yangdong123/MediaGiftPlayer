@@ -1,4 +1,4 @@
-package com.example.yangdong.mediagiftplayer.harddecode;
+package com.example.yangdong.mediagiftplayerlibrary.utils.view;
 
 import android.content.Context;
 import android.util.AttributeSet;

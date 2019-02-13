@@ -14,11 +14,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.yangdong.mediagiftplayer.R;
+import com.example.yangdong.mediagiftplayerlibrary.utils.TextureSurfaceRenderer;
+import com.example.yangdong.mediagiftplayerlibrary.utils.VideoTextureSurfaceRenderer;
 
 import java.io.File;
 import java.io.IOException;
 
 /**
+ * MediaPlayer 的方式
  * Created by MrDong on 2019/1/28.
  */
 public class TextureViewMediaActivity extends Activity implements TextureView.SurfaceTextureListener,

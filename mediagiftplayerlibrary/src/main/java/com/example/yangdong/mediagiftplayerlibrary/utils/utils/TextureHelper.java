@@ -1,4 +1,4 @@
-package com.example.yangdong.mediagiftplayer.playvideo.utils;
+package com.example.yangdong.mediagiftplayerlibrary.utils.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
