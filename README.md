@@ -1,7 +1,6 @@
 # PlayVideo-OpenGL 通过Opengl ES去绘制视频实现礼物动效
 
-### 实现原理 
-    http://note.youdao.com/noteshare?id=984d9daaab0db873ee058ee579936905
+### 实现原理（http://note.youdao.com/noteshare?id=984d9daaab0db873ee058ee579936905）
 
 ### 实现礼物动效的方式
 1.Lottie 动画是实现 ， json 文件描述，这个实现方式对于简单的动效实现好，但是对于复杂的动画就不能使用了
