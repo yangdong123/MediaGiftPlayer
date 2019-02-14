@@ -22,7 +22,7 @@ import java.nio.ByteBuffer;
  */
 public class GiftView extends TextureView implements TextureView.SurfaceTextureListener, SurfaceTexture.OnFrameAvailableListener {
 
-
+    private static String TAG = "yd";
     private boolean isPlaying;
     private PlayerThread playerThread;
     private VideoTextureSurfaceRenderer videoRenderer;
@@ -77,6 +77,9 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        if (playerThread != null) {
+            playerThread.interrupt();
+        }
         isPlaying = false;
         return false;
     }
@@ -136,7 +139,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
             }
 
             if (decoder == null) {
-                Log.e("DecodeActivity", "Can't find video info!");
+                Log.e(TAG, "Can't find video info!");
                 return;
             }
 
@@ -155,7 +158,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                         ByteBuffer buffer = inputBuffers[inIndex];
                         int sampleSize = extractor.readSampleData(buffer, 0);
                         if (sampleSize < 0) {
-                            Log.d("DecodeActivity", "InputBuffer BUFFER_FLAG_END_OF_STREAM");
+                            Log.d(TAG, "InputBuffer BUFFER_FLAG_END_OF_STREAM");
                             decoder.queueInputBuffer(inIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
                             isEOS = true;
                         } else {
@@ -168,18 +171,18 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                 int outIndex = decoder.dequeueOutputBuffer(info, 10000);
                 switch (outIndex) {
                     case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
-                        Log.d("DecodeActivity", "INFO_OUTPUT_BUFFERS_CHANGED");
+                        Log.d(TAG, "INFO_OUTPUT_BUFFERS_CHANGED");
                         outputBuffers = decoder.getOutputBuffers();
                         break;
                     case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
-                        Log.d("DecodeActivity", "New format " + decoder.getOutputFormat());
+                        Log.d(TAG, "New format " + decoder.getOutputFormat());
                         break;
                     case MediaCodec.INFO_TRY_AGAIN_LATER:
-                        Log.d("DecodeActivity", "dequeueOutputBuffer timed out!");
+                        Log.d(TAG, "dequeueOutputBuffer timed out!");
                         break;
                     default:
                         ByteBuffer buffer = outputBuffers[outIndex];
-//                        Log.v("DecodeActivity", "We can't use this buffer but render it due to the API limit, " + buffer);
+//                        Log.v(TAG, "We can't use this buffer but render it due to the API limit, " + buffer);
 
                         // We use a very simple clock to keep the video FPS, or the video
                         // playback will be too fast
@@ -197,7 +200,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
 
                 // All decoded frames have been rendered, we can stop playing now
                 if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-                    Log.d("DecodeActivity", "OutputBuffer BUFFER_FLAG_END_OF_STREAM");
+                    Log.d(TAG, "OutputBuffer BUFFER_FLAG_END_OF_STREAM");
 
                     break;
                 }
@@ -207,6 +210,11 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
             decoder.release();
             extractor.release();
             isPlaying = false;
+            if (videoRenderer != null) {
+                playerThread.interrupt();
+                videoRenderer.onPause();
+                videoRenderer = null;
+            }
             if (onTextureListener != null) {
                 onTextureListener.onCompleted();
                 surface.release();
@@ -231,9 +239,6 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if (videoRenderer != null) {
-            videoRenderer.onPause();
-            videoRenderer = null;
-        }
+
     }
 }
