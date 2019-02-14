@@ -81,4 +81,6 @@
   
  #### 12.等待onSurfaceTextureAvailable 回调成功后开始解码获取流数据
    
+   
+![image](https://github.com/yangdong123/MediaGiftPlayer/master/app/src/main/res/mipmap-hdpi/animtion.gif?raw=true)
 
