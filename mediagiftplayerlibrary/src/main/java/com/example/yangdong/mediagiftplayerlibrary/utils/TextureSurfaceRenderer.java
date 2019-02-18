@@ -114,6 +114,7 @@ public abstract class TextureSurfaceRenderer implements Runnable {
      * 通常在Opengl context 初始化以后被调用，需要子类去实现
      */
     protected abstract void initGLComponents();
+
     protected abstract void initGLTexture();
 
     protected abstract void deinitGLComponents();
@@ -180,4 +181,5 @@ public abstract class TextureSurfaceRenderer implements Runnable {
         super.finalize();
         running = false;
     }
+
 }

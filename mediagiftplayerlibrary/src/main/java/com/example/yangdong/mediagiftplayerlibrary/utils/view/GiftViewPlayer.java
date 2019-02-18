@@ -72,6 +72,17 @@ public class GiftViewPlayer extends FrameLayout {
 
                 giftView.playAnim();
             }
+
+            @Override
+            public void onFail() {
+                getRootView().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        GiftViewPlayer.this.removeView(giftView);
+                        setPlayParam();
+                    }
+                });
+            }
         });
 
         addView(giftView);

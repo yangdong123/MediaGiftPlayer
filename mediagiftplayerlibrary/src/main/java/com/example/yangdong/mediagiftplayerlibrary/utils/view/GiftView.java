@@ -140,6 +140,9 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
 
             if (decoder == null) {
                 Log.e(TAG, "Can't find video info!");
+                if (onTextureListener != null) {
+                    onTextureListener.onFail();
+                }
                 return;
             }
 
@@ -230,10 +233,22 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
         this.onTextureListener = onTextureListener;
     }
 
-    interface OnTextureListener {
+    public interface OnTextureListener {
+        /**
+         * 播放完成
+         */
         void onCompleted();
 
+        /**
+         * 初始化完成
+         */
         void onTextureAvailable();
+
+
+        /**
+         * 出错
+         */
+        void onFail();
     }
 
     @Override
