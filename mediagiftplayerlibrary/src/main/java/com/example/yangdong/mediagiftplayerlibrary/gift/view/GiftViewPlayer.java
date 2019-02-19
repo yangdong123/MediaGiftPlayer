@@ -1,4 +1,4 @@
-package com.example.yangdong.mediagiftplayerlibrary.utils.view;
+package com.example.yangdong.mediagiftplayerlibrary.gift.view;
 
 import android.content.Context;
 import android.util.AttributeSet;

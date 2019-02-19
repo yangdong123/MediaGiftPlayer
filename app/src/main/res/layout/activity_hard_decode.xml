@@ -27,7 +27,7 @@
         android:layout_marginBottom="20dp"
         android:textSize="10dp" />
 
-    <com.example.yangdong.mediagiftplayerlibrary.utils.view.GiftViewPlayer
+    <com.example.yangdong.mediagiftplayerlibrary.gift.view.GiftViewPlayer
         android:id="@+id/id_textureview"
         android:layout_width="300dp"
         android:layout_height="300dp"

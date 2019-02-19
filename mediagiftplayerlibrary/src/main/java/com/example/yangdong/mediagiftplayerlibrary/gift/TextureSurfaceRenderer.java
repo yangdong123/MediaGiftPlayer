@@ -1,4 +1,4 @@
-package com.example.yangdong.mediagiftplayerlibrary.utils;
+package com.example.yangdong.mediagiftplayerlibrary.gift;
 
 import android.graphics.SurfaceTexture;
 import android.opengl.EGL14;

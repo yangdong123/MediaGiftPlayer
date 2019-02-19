@@ -5,8 +5,8 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.example.yangdong.mediagiftplayer.R;
-import com.example.yangdong.mediagiftplayerlibrary.utils.utils.FileUtil;
-import com.example.yangdong.mediagiftplayerlibrary.utils.view.GiftViewPlayer;
+import com.example.yangdong.mediagiftplayerlibrary.gift.utils.FileUtil;
+import com.example.yangdong.mediagiftplayerlibrary.gift.view.GiftViewPlayer;
 
 import java.util.ArrayList;
 import java.util.HashMap;

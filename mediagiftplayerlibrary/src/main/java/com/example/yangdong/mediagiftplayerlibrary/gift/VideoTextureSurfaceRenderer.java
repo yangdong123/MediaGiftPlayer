@@ -1,4 +1,4 @@
-package com.example.yangdong.mediagiftplayerlibrary.utils;
+package com.example.yangdong.mediagiftplayerlibrary.gift;
 
 
 import android.content.Context;
@@ -9,8 +9,8 @@ import android.opengl.GLUtils;
 import android.util.Log;
 
 import com.example.yangdong.mediagiftplayerlibrary.R;
-import com.example.yangdong.mediagiftplayerlibrary.utils.utils.RawResourceReader;
-import com.example.yangdong.mediagiftplayerlibrary.utils.utils.ShaderHelper;
+import com.example.yangdong.mediagiftplayerlibrary.gift.utils.RawResourceReader;
+import com.example.yangdong.mediagiftplayerlibrary.gift.utils.ShaderHelper;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
