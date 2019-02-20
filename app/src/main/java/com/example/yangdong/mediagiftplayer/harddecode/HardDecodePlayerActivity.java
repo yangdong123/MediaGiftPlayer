@@ -59,7 +59,7 @@ public class HardDecodePlayerActivity extends Activity implements View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bt_start_add:
-                if (index > 3) {
+                if (index > videoPaths.size()-1) {
                     index = 0;
                 }
                 giftView.play(videoPaths.get(index));
