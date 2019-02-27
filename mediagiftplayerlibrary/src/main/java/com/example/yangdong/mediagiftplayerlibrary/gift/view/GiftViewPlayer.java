@@ -4,8 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.LinkedList;
 
 /**
  * Created by MrDong on 2019/2/11.
@@ -13,7 +12,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 public class GiftViewPlayer extends FrameLayout {
     private int childViewCount;
 
-    private Queue<String> giftQueue = new LinkedBlockingDeque<>();
+    private LinkedList<String> giftQueue = new LinkedList<>();
 
     public GiftViewPlayer(Context context) {
         this(context, null);
@@ -39,7 +38,16 @@ public class GiftViewPlayer extends FrameLayout {
 
 
     public void play(String videoPath) {
-        giftQueue.add(videoPath);
+        giftQueue.addLast(videoPath);
+        setPlayParam();
+    }
+
+    public void play(String videoPath, boolean isAddFirst) {
+        if (isAddFirst) {
+            giftQueue.addFirst(videoPath);
+        } else {
+            giftQueue.addLast(videoPath);
+        }
         setPlayParam();
     }
 
@@ -49,8 +57,10 @@ public class GiftViewPlayer extends FrameLayout {
         }
 
         final GiftView giftView = new GiftView(getContext());
-
-        String videoPath = giftQueue.poll();
+        String videoPath = null;
+        if (!giftQueue.isEmpty()) {
+            videoPath = giftQueue.removeFirst();
+        }
         if (videoPath == null || videoPath.length() == 0) {
             return;
         }
