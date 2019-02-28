@@ -13,6 +13,12 @@ import android.widget.Toast;
 
 import com.example.yangdong.mediagiftplayer.harddecode.HardDecodePlayerActivity;
 import com.example.yangdong.mediagiftplayer.playvideo.TextureViewMediaActivity;
+import com.example.yangdong.mediagiftplayerlibrary.gift.utils.FileUtil;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -30,6 +36,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.button_texture_view).setOnClickListener(this);
         findViewById(R.id.button_hard_texture_view).setOnClickListener(this);
     }
+
+
+
 
 
     @Override

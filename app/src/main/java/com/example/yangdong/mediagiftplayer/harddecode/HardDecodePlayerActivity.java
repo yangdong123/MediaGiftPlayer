@@ -43,6 +43,7 @@ public class HardDecodePlayerActivity extends Activity implements View.OnClickLi
         fileMap.put("fly.mp4", R.raw.fly);
         fileMap.put("money.mp4", R.raw.money);
         fileMap.put("rocket.mp4", R.raw.rocket);
+        fileMap.put("shipe.mp4", R.raw.ship);
         for (Map.Entry<String, Integer> entry : fileMap.entrySet()) {
             String key = entry.getKey();
             Integer value = entry.getValue();
