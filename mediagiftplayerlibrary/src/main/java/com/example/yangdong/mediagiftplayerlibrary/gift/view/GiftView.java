@@ -130,11 +130,11 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                     extractor.selectTrack(i);
                     try {
                         decoder = MediaCodec.createDecoderByType(mime);
+                        decoder.configure(format, surface, null, 0);
+                        break;
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    decoder.configure(format, surface, null, 0);
-                    break;
                 }
             }
 
@@ -156,7 +156,14 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
 
             while (!Thread.interrupted()) {
                 if (!isEOS) {
-                    int inIndex = decoder.dequeueInputBuffer(10000);
+                    //1 准备填充器
+                    int inIndex = -1;
+                    try {
+                        inIndex = decoder.dequeueInputBuffer(10000);
+                    } catch (IllegalStateException e) {
+                        e.printStackTrace();
+                        Log.e(TAG, "IllegalStateException dequeueInputBuffer ");
+                    }
                     if (inIndex >= 0) {
                         ByteBuffer buffer = inputBuffers[inIndex];
                         int sampleSize = extractor.readSampleData(buffer, 0);
@@ -170,8 +177,14 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                         }
                     }
                 }
-
-                int outIndex = decoder.dequeueOutputBuffer(info, 10000);
+                //4 开始解码
+                int outIndex = MediaCodec.INFO_TRY_AGAIN_LATER;
+                try {
+                    outIndex = decoder.dequeueOutputBuffer(info, 10000);
+                } catch (IllegalStateException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "IllegalStateException dequeueOutputBuffer " + e.getMessage());
+                }
                 switch (outIndex) {
                     case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
                         Log.d(TAG, "INFO_OUTPUT_BUFFERS_CHANGED");
