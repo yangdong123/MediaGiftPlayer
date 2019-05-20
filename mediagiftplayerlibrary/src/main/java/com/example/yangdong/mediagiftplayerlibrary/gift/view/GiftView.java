@@ -90,7 +90,9 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
     }
 
     public void playAnim() {
-
+        if (videoRenderer == null) {
+            return;
+        }
         isPlaying = true;
         Surface surface = new Surface(videoRenderer.getVideoTexture());
         playerThread = new PlayerThread(surface, videoPath);
