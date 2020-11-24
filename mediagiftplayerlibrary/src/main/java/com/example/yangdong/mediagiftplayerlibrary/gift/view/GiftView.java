@@ -105,8 +105,6 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
     }
 
     private class PlayerThread extends Thread {
-        private MediaExtractor extractor;
-        private MediaCodec decoder;
         private Surface surface;
         private String filePath;
 
@@ -118,7 +116,8 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
         @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
         @Override
         public void run() {
-            extractor = new MediaExtractor();
+            MediaCodec decoder = null;
+            MediaExtractor extractor = new MediaExtractor();
             try {
                 extractor.setDataSource(filePath);
             } catch (IOException e) {
@@ -131,7 +130,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                 if (mime.startsWith("video/")) {
                     extractor.selectTrack(i);
                     try {
-                        decoder = MediaCodec.createDecoderByType(mime);
+                         decoder = MediaCodec.createDecoderByType(mime);
                         decoder.configure(format, surface, null, 0);
                         break;
                     } catch (IOException e) {
@@ -218,15 +217,19 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
 
                 // All decoded frames have been rendered, we can stop playing now
                 if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-                    Log.d(TAG, "OutputBuffer BUFFER_FLAG_END_OF_STREAM");
+                    Log.e(TAG, "OutputBuffer BUFFER_FLAG_END_OF_STREAM");
 
                     break;
                 }
             }
-
-            decoder.stop();
-            decoder.release();
-            extractor.release();
+            try {
+                decoder.stop();
+            } catch (Exception e) {
+                Log.e(TAG, "IllegalStateException decoder.stop ");
+            } finally {
+                decoder.release();
+                extractor.release();
+            }
             isPlaying = false;
             if (videoRenderer != null) {
                 playerThread.interrupt();
