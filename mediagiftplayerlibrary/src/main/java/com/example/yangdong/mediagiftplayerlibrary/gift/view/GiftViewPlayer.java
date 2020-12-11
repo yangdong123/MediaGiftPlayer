@@ -11,6 +11,8 @@ import java.util.LinkedList;
  */
 public class GiftViewPlayer extends FrameLayout {
     private int childViewCount;
+    private boolean isResource;
+    private GiftViewPlayerInterface mGiftViewPlayerInterface;
 
     private LinkedList<String> giftQueue = new LinkedList<>();
 
@@ -42,6 +44,13 @@ public class GiftViewPlayer extends FrameLayout {
         setPlayParam();
     }
 
+    public void play(String videoPath, boolean isResource, GiftViewPlayerInterface giftViewPlayerInterface) {
+        this.mGiftViewPlayerInterface = giftViewPlayerInterface;
+        this.isResource = isResource;
+        giftQueue.addLast(videoPath);
+        setPlayParam();
+    }
+
     public void play(String videoPath, boolean isAddFirst) {
         if (isAddFirst) {
             giftQueue.addFirst(videoPath);
@@ -50,6 +59,18 @@ public class GiftViewPlayer extends FrameLayout {
         }
         setPlayParam();
     }
+
+    public void play(String videoPath, boolean isAddFirst, boolean isResource, GiftViewPlayerInterface giftViewPlayerInterface) {
+        this.mGiftViewPlayerInterface = giftViewPlayerInterface;
+        this.isResource = isResource;
+        if (isAddFirst) {
+            giftQueue.addFirst(videoPath);
+        } else {
+            giftQueue.addLast(videoPath);
+        }
+        setPlayParam();
+    }
+
 
     private void setPlayParam() {
         if (getChildCount() >= childViewCount) {
@@ -71,6 +92,9 @@ public class GiftViewPlayer extends FrameLayout {
                 getRootView().post(new Runnable() {
                     @Override
                     public void run() {
+                        if (mGiftViewPlayerInterface != null) {
+                            mGiftViewPlayerInterface.onCompleted();
+                        }
                         GiftViewPlayer.this.removeView(giftView);
                         setPlayParam();
                     }
@@ -79,8 +103,10 @@ public class GiftViewPlayer extends FrameLayout {
 
             @Override
             public void onTextureAvailable() {
-
-                giftView.playAnim();
+                if (mGiftViewPlayerInterface != null) {
+                    mGiftViewPlayerInterface.onTextureAvailable();
+                }
+                giftView.playAnim(isResource);
             }
 
             @Override
@@ -88,6 +114,9 @@ public class GiftViewPlayer extends FrameLayout {
                 getRootView().post(new Runnable() {
                     @Override
                     public void run() {
+                        if (mGiftViewPlayerInterface != null) {
+                            mGiftViewPlayerInterface.onFail();
+                        }
                         GiftViewPlayer.this.removeView(giftView);
                         setPlayParam();
                     }
@@ -103,5 +132,17 @@ public class GiftViewPlayer extends FrameLayout {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         removeAllViews();
+    }
+
+    public void cleanData() {
+        giftQueue.clear();
+    }
+
+    public interface GiftViewPlayerInterface {
+        void onCompleted();
+
+        void onTextureAvailable();
+
+        void onFail();
     }
 }

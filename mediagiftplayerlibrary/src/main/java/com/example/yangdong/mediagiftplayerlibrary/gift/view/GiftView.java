@@ -5,6 +5,7 @@ import android.graphics.SurfaceTexture;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
+import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
@@ -89,15 +90,20 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
 
     }
 
-    public void playAnim() {
+    public void playAnim(boolean isResource) {
         if (videoRenderer == null) {
             return;
         }
         isPlaying = true;
         Surface surface = new Surface(videoRenderer.getVideoTexture());
-        playerThread = new PlayerThread(surface, videoPath);
+        if (isResource) {
+            playerThread = new PlayerThread(getContext().getApplicationContext(),surface, videoPath);
+        } else {
+            playerThread = new PlayerThread(surface, videoPath);
+        }
         playerThread.start();
     }
+
 
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
@@ -105,10 +111,17 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
     }
 
     private class PlayerThread extends Thread {
+        private Context context;
         private Surface surface;
         private String filePath;
 
         public PlayerThread(Surface surface, String filePath) {
+            this.surface = surface;
+            this.filePath = filePath;
+        }
+
+        public PlayerThread(Context context, Surface surface, String filePath) {
+            this.context = context;
             this.surface = surface;
             this.filePath = filePath;
         }
@@ -119,7 +132,11 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
             MediaCodec decoder = null;
             MediaExtractor extractor = new MediaExtractor();
             try {
-                extractor.setDataSource(filePath);
+                if (context != null) {
+                    extractor.setDataSource(context, Uri.parse(filePath), null);
+                } else {
+                    extractor.setDataSource(filePath);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -130,7 +147,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                 if (mime.startsWith("video/")) {
                     extractor.selectTrack(i);
                     try {
-                         decoder = MediaCodec.createDecoderByType(mime);
+                        decoder = MediaCodec.createDecoderByType(mime);
                         decoder.configure(format, surface, null, 0);
                         break;
                     } catch (IOException e) {
