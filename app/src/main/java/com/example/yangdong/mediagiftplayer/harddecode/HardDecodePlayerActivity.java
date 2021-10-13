@@ -2,6 +2,7 @@ package com.example.yangdong.mediagiftplayer.harddecode;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import com.example.yangdong.mediagiftplayer.R;
@@ -63,7 +64,22 @@ public class HardDecodePlayerActivity extends Activity implements View.OnClickLi
                 if (index > videoPaths.size()-1) {
                     index = 0;
                 }
-                giftView.play(videoPaths.get(index));
+                giftView.play(videoPaths.get(index), false, new GiftViewPlayer.GiftViewPlayerInterface() {
+                    @Override
+                    public void onCompleted(String path) {
+                        Log.e("yd","onCompleted  " +path );
+                    }
+
+                    @Override
+                    public void onTextureAvailable(String path) {
+                        Log.e("yd","onTextureAvailable  " +path );
+                    }
+
+                    @Override
+                    public void onFail(String path) {
+                        Log.e("yd","onFail  " +path );
+                    }
+                });
                 index++;
                 break;
         }

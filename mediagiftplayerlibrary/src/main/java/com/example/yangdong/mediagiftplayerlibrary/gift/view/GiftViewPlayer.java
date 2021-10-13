@@ -38,12 +38,20 @@ public class GiftViewPlayer extends FrameLayout {
         this.childViewCount = childViewCount;
     }
 
-
+    /**
+     * 本地路劲
+     * @param videoPath
+     */
     public void play(String videoPath) {
         giftQueue.addLast(videoPath);
         setPlayParam();
     }
 
+    /**
+     * @param videoPath 路径
+     * @param isResource 是否资源文件
+     * @param giftViewPlayerInterface
+     */
     public void play(String videoPath, boolean isResource, GiftViewPlayerInterface giftViewPlayerInterface) {
         this.mGiftViewPlayerInterface = giftViewPlayerInterface;
         this.isResource = isResource;
@@ -51,6 +59,10 @@ public class GiftViewPlayer extends FrameLayout {
         setPlayParam();
     }
 
+    /**
+     * @param videoPath 路径
+     * @param isAddFirst 是否加到队头
+     */
     public void play(String videoPath, boolean isAddFirst) {
         if (isAddFirst) {
             giftQueue.addFirst(videoPath);
@@ -60,6 +72,12 @@ public class GiftViewPlayer extends FrameLayout {
         setPlayParam();
     }
 
+    /**
+     * @param videoPath 路劲
+     * @param isAddFirst 是否加到队头
+     * @param isResource 是否资源文件
+     * @param giftViewPlayerInterface 回调状态
+     */
     public void play(String videoPath, boolean isAddFirst, boolean isResource, GiftViewPlayerInterface giftViewPlayerInterface) {
         this.mGiftViewPlayerInterface = giftViewPlayerInterface;
         this.isResource = isResource;
@@ -86,6 +104,7 @@ public class GiftViewPlayer extends FrameLayout {
             return;
         }
         giftView.setVideoPath(videoPath);
+        final String finalVideoPath = videoPath;
         giftView.setOnTextureListener(new GiftView.OnTextureListener() {
             @Override
             public void onCompleted() {
@@ -93,7 +112,7 @@ public class GiftViewPlayer extends FrameLayout {
                     @Override
                     public void run() {
                         if (mGiftViewPlayerInterface != null) {
-                            mGiftViewPlayerInterface.onCompleted();
+                            mGiftViewPlayerInterface.onCompleted(finalVideoPath);
                         }
                         GiftViewPlayer.this.removeView(giftView);
                         setPlayParam();
@@ -104,7 +123,7 @@ public class GiftViewPlayer extends FrameLayout {
             @Override
             public void onTextureAvailable() {
                 if (mGiftViewPlayerInterface != null) {
-                    mGiftViewPlayerInterface.onTextureAvailable();
+                    mGiftViewPlayerInterface.onTextureAvailable(finalVideoPath);
                 }
                 giftView.playAnim(isResource);
             }
@@ -115,7 +134,7 @@ public class GiftViewPlayer extends FrameLayout {
                     @Override
                     public void run() {
                         if (mGiftViewPlayerInterface != null) {
-                            mGiftViewPlayerInterface.onFail();
+                            mGiftViewPlayerInterface.onFail(finalVideoPath);
                         }
                         GiftViewPlayer.this.removeView(giftView);
                         setPlayParam();
@@ -139,10 +158,10 @@ public class GiftViewPlayer extends FrameLayout {
     }
 
     public interface GiftViewPlayerInterface {
-        void onCompleted();
+        void onCompleted(String path);
 
-        void onTextureAvailable();
+        void onTextureAvailable(String path);
 
-        void onFail();
+        void onFail(String path);
     }
 }
