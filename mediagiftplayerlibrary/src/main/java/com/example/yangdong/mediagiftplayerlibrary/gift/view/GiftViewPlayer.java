@@ -40,6 +40,7 @@ public class GiftViewPlayer extends FrameLayout {
 
     /**
      * 本地路劲
+     *
      * @param videoPath
      */
     public void play(String videoPath) {
@@ -48,8 +49,8 @@ public class GiftViewPlayer extends FrameLayout {
     }
 
     /**
-     * @param videoPath 路径
-     * @param isResource 是否资源文件
+     * @param videoPath               路径
+     * @param isResource              是否资源文件
      * @param giftViewPlayerInterface
      */
     public void play(String videoPath, boolean isResource, GiftViewPlayerInterface giftViewPlayerInterface) {
@@ -60,7 +61,7 @@ public class GiftViewPlayer extends FrameLayout {
     }
 
     /**
-     * @param videoPath 路径
+     * @param videoPath  路径
      * @param isAddFirst 是否加到队头
      */
     public void play(String videoPath, boolean isAddFirst) {
@@ -73,13 +74,28 @@ public class GiftViewPlayer extends FrameLayout {
     }
 
     /**
-     * @param videoPath 路劲
-     * @param isAddFirst 是否加到队头
-     * @param isResource 是否资源文件
+     * @param videoPath               路劲
+     * @param isAddFirst              是否加到队头
+     * @param isResource              是否资源文件
      * @param giftViewPlayerInterface 回调状态
      */
     public void play(String videoPath, boolean isAddFirst, boolean isResource, GiftViewPlayerInterface giftViewPlayerInterface) {
         this.mGiftViewPlayerInterface = giftViewPlayerInterface;
+        this.isResource = isResource;
+        if (isAddFirst) {
+            giftQueue.addFirst(videoPath);
+        } else {
+            giftQueue.addLast(videoPath);
+        }
+        setPlayParam();
+    }
+
+    /**
+     * @param videoPath               路劲
+     * @param isAddFirst              是否加到队头
+     * @param isResource              是否资源文件
+     */
+    public void play(String videoPath, boolean isAddFirst, boolean isResource) {
         this.isResource = isResource;
         if (isAddFirst) {
             giftQueue.addFirst(videoPath);
