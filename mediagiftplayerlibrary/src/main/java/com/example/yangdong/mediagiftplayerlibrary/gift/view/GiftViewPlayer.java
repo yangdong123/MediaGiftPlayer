@@ -12,6 +12,7 @@ import java.util.LinkedList;
 public class GiftViewPlayer extends FrameLayout {
     private int childViewCount;
     private boolean isResource;
+    private boolean isMediaPlayer;
     private GiftViewPlayerInterface mGiftViewPlayerInterface;
 
     private LinkedList<String> giftQueue = new LinkedList<>();
@@ -94,9 +95,28 @@ public class GiftViewPlayer extends FrameLayout {
      * @param videoPath               路劲
      * @param isAddFirst              是否加到队头
      * @param isResource              是否资源文件
+     * @param giftViewPlayerInterface 回调状态
      */
-    public void play(String videoPath, boolean isAddFirst, boolean isResource) {
+    public void play(String videoPath, boolean isAddFirst, boolean isResource,boolean isMediaPlayer, GiftViewPlayerInterface giftViewPlayerInterface) {
+        this.mGiftViewPlayerInterface = giftViewPlayerInterface;
         this.isResource = isResource;
+        this.isMediaPlayer = isMediaPlayer;
+        if (isAddFirst) {
+            giftQueue.addFirst(videoPath);
+        } else {
+            giftQueue.addLast(videoPath);
+        }
+        setPlayParam();
+    }
+
+    /**
+     * @param videoPath               路劲
+     * @param isAddFirst              是否加到队头
+     * @param isResource              是否资源文件
+     */
+    public void play(String videoPath, boolean isAddFirst, boolean isResource,boolean isMediaPlayer) {
+        this.isResource = isResource;
+        this.isMediaPlayer = isMediaPlayer;
         if (isAddFirst) {
             giftQueue.addFirst(videoPath);
         } else {
@@ -141,7 +161,7 @@ public class GiftViewPlayer extends FrameLayout {
                 if (mGiftViewPlayerInterface != null) {
                     mGiftViewPlayerInterface.onTextureAvailable(finalVideoPath);
                 }
-                giftView.playAnim(isResource);
+                giftView.playAnim(isResource,isMediaPlayer);
             }
 
             @Override

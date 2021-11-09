@@ -5,6 +5,7 @@ import android.graphics.SurfaceTexture;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -14,20 +15,25 @@ import android.view.Surface;
 import android.view.TextureView;
 
 import com.example.yangdong.mediagiftplayerlibrary.gift.VideoTextureSurfaceRenderer;
+import com.example.yangdong.mediagiftplayerlibrary.gift.utils.SystemUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
  * Created by MrDong on 2019/2/11.
  */
-public class GiftView extends TextureView implements TextureView.SurfaceTextureListener, SurfaceTexture.OnFrameAvailableListener {
+public class GiftView extends TextureView implements TextureView.SurfaceTextureListener, SurfaceTexture.OnFrameAvailableListener, MediaPlayer.OnPreparedListener {
 
     private static String TAG = "yd";
     private boolean isPlaying;
     private PlayerThread playerThread;
     private VideoTextureSurfaceRenderer videoRenderer;
     private String videoPath;
+    private MediaPlayer mediaPlayer;
+    private int surfaceWidth;
+    private int surfaceHeight;
 
 
     public GiftView(Context context) {
@@ -57,9 +63,10 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-
+        surfaceWidth = width;
+        surfaceHeight = height;
         SurfaceTexture surfaceTexture = getSurfaceTexture();
-        videoRenderer = new VideoTextureSurfaceRenderer(getContext().getApplicationContext(), surfaceTexture, 0, 0);
+        videoRenderer = new VideoTextureSurfaceRenderer(getContext().getApplicationContext(), surfaceTexture, surfaceWidth, surfaceHeight);
         videoRenderer.setOnFrameAvailableListener(new VideoTextureSurfaceRenderer.OnFrameAvailableListener() {
             @Override
             public void onFrameAvailable(SurfaceTexture surfaceTexture) {
@@ -90,24 +97,76 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
 
     }
 
-    public void playAnim(boolean isResource) {
+    public void playAnim(boolean isResource,boolean isMediaPlayer) {
         if (videoRenderer == null) {
             return;
         }
         isPlaying = true;
         Surface surface = new Surface(videoRenderer.getVideoTexture());
-        if (isResource) {
-            playerThread = new PlayerThread(getContext().getApplicationContext(),surface, videoPath);
+        if (isMediaPlayer) {
+            playMediaPlayer(surface);
         } else {
-            playerThread = new PlayerThread(surface, videoPath);
+            if (isResource) {
+                playerThread = new PlayerThread(getContext().getApplicationContext(), surface, videoPath);
+            } else {
+                playerThread = new PlayerThread(surface, videoPath);
+            }
+            playerThread.start();
         }
-        playerThread.start();
     }
 
 
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
 
+    }
+
+
+    private void playMediaPlayer(Surface surface) {
+        try {
+            if (mediaPlayer == null) {
+                this.mediaPlayer = new MediaPlayer();
+                mediaPlayer.setOnPreparedListener(this);
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        onTextureListener.onCompleted();
+                    }
+                });
+            }
+            if (!new File(videoPath).exists()) {
+                onTextureListener.onFail();
+            }
+
+            mediaPlayer.setDataSource(videoPath);
+            mediaPlayer.setSurface(surface);
+            surface.release();
+
+            mediaPlayer.prepareAsync();
+        } catch (IllegalArgumentException e1) {
+            e1.printStackTrace();
+            onTextureListener.onFail();
+        } catch (SecurityException e1) {
+            e1.printStackTrace();
+            onTextureListener.onFail();
+        } catch (IllegalStateException e1) {
+            e1.printStackTrace();
+            onTextureListener.onFail();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+            onTextureListener.onFail();
+        }
+    }
+
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        try {
+            if (mp != null) {
+                mp.start();
+            }
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
     }
 
     private class PlayerThread extends Thread {
@@ -289,6 +348,8 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+        }
     }
 }
