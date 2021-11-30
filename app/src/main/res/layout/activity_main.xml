@@ -21,6 +21,6 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="93dp"
-        android:text="MediaCodec + TextureView实现" />
+        android:text="HardDecode + TextureView实现" />
 
 </LinearLayout>

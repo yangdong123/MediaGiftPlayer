@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.example.yangdong.mediagiftplayer.R;
+import com.example.yangdong.mediagiftplayerlibrary.gift.bean.GiftBean;
 import com.example.yangdong.mediagiftplayerlibrary.gift.utils.FileUtil;
 import com.example.yangdong.mediagiftplayerlibrary.gift.view.GiftViewPlayer;
 
@@ -64,20 +65,20 @@ public class HardDecodePlayerActivity extends Activity implements View.OnClickLi
                 if (index > videoPaths.size()-1) {
                     index = 0;
                 }
-                giftView.play(videoPaths.get(index), false, new GiftViewPlayer.GiftViewPlayerInterface() {
+                giftView.play(videoPaths.get(index), 0, false, true, false, new GiftViewPlayer.GiftViewPlayerInterface() {
                     @Override
-                    public void onCompleted(String path) {
-                        Log.e("yd","onCompleted  " +path );
+                    public void onCompleted(GiftBean giftBean) {
+
                     }
 
                     @Override
-                    public void onTextureAvailable(String path) {
-                        Log.e("yd","onTextureAvailable  " +path );
+                    public void onTextureAvailable(GiftBean giftBean) {
+
                     }
 
                     @Override
-                    public void onFail(String path) {
-                        Log.e("yd","onFail  " +path );
+                    public void onFail(GiftBean giftBean) {
+
                     }
                 });
                 index++;

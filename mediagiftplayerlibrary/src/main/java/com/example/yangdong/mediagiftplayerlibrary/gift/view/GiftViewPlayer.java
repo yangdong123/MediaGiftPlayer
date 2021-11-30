@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
+import com.example.yangdong.mediagiftplayerlibrary.gift.bean.GiftBean;
+
 import java.util.LinkedList;
 
 /**
@@ -11,11 +13,9 @@ import java.util.LinkedList;
  */
 public class GiftViewPlayer extends FrameLayout {
     private int childViewCount;
-    private boolean isResource;
-    private boolean isMediaPlayer;
     private GiftViewPlayerInterface mGiftViewPlayerInterface;
 
-    private LinkedList<String> giftQueue = new LinkedList<>();
+    private LinkedList<GiftBean> giftQueue = new LinkedList<>();
 
     public GiftViewPlayer(Context context) {
         this(context, null);
@@ -39,108 +39,56 @@ public class GiftViewPlayer extends FrameLayout {
         this.childViewCount = childViewCount;
     }
 
-    /**
-     * 本地路劲
-     *
-     * @param videoPath
-     */
-    public void play(String videoPath) {
-        giftQueue.addLast(videoPath);
-        setPlayParam();
-    }
 
     /**
-     * @param videoPath               路径
+     * @param videoPath               路劲
+     * @param type                    返回不同type
+     * @param isAddFirst              是否加到队头
      * @param isResource              是否资源文件
-     * @param giftViewPlayerInterface
      */
-    public void play(String videoPath, boolean isResource, GiftViewPlayerInterface giftViewPlayerInterface) {
-        this.mGiftViewPlayerInterface = giftViewPlayerInterface;
-        this.isResource = isResource;
-        giftQueue.addLast(videoPath);
-        setPlayParam();
-    }
-
-    /**
-     * @param videoPath  路径
-     * @param isAddFirst 是否加到队头
-     */
-    public void play(String videoPath, boolean isAddFirst) {
+    public void play(String videoPath, int type ,boolean isAddFirst, boolean isResource,boolean isMediaPlayer) {
+        GiftBean giftBean = new GiftBean(videoPath, type, isResource, isMediaPlayer);
         if (isAddFirst) {
-            giftQueue.addFirst(videoPath);
+            giftQueue.addFirst(giftBean);
         } else {
-            giftQueue.addLast(videoPath);
+            giftQueue.addLast(giftBean);
         }
         setPlayParam();
     }
 
     /**
      * @param videoPath               路劲
+     * @param type                    返回不同type
      * @param isAddFirst              是否加到队头
      * @param isResource              是否资源文件
-     * @param giftViewPlayerInterface 回调状态
      */
-    public void play(String videoPath, boolean isAddFirst, boolean isResource, GiftViewPlayerInterface giftViewPlayerInterface) {
+    public void play(String videoPath, int type ,boolean isAddFirst, boolean isResource,boolean isMediaPlayer, GiftViewPlayerInterface giftViewPlayerInterface) {
         this.mGiftViewPlayerInterface = giftViewPlayerInterface;
-        this.isResource = isResource;
+        GiftBean giftBean = new GiftBean(videoPath, type, isResource, isMediaPlayer);
         if (isAddFirst) {
-            giftQueue.addFirst(videoPath);
+            giftQueue.addFirst(giftBean);
         } else {
-            giftQueue.addLast(videoPath);
+            giftQueue.addLast(giftBean);
         }
         setPlayParam();
     }
-
-    /**
-     * @param videoPath               路劲
-     * @param isAddFirst              是否加到队头
-     * @param isResource              是否资源文件
-     * @param giftViewPlayerInterface 回调状态
-     */
-    public void play(String videoPath, boolean isAddFirst, boolean isResource,boolean isMediaPlayer, GiftViewPlayerInterface giftViewPlayerInterface) {
-        this.mGiftViewPlayerInterface = giftViewPlayerInterface;
-        this.isResource = isResource;
-        this.isMediaPlayer = isMediaPlayer;
-        if (isAddFirst) {
-            giftQueue.addFirst(videoPath);
-        } else {
-            giftQueue.addLast(videoPath);
-        }
-        setPlayParam();
-    }
-
-    /**
-     * @param videoPath               路劲
-     * @param isAddFirst              是否加到队头
-     * @param isResource              是否资源文件
-     */
-    public void play(String videoPath, boolean isAddFirst, boolean isResource,boolean isMediaPlayer) {
-        this.isResource = isResource;
-        this.isMediaPlayer = isMediaPlayer;
-        if (isAddFirst) {
-            giftQueue.addFirst(videoPath);
-        } else {
-            giftQueue.addLast(videoPath);
-        }
-        setPlayParam();
-    }
-
 
     private void setPlayParam() {
+        GiftBean giftBean = null;
         if (getChildCount() >= childViewCount) {
             return;
         }
 
         final GiftView giftView = new GiftView(getContext());
-        String videoPath = null;
+
         if (!giftQueue.isEmpty()) {
-            videoPath = giftQueue.removeFirst();
+            giftBean = giftQueue.removeFirst();
         }
-        if (videoPath == null || videoPath.length() == 0) {
+        if (giftBean == null || giftBean.path.length() == 0) {
             return;
         }
-        giftView.setVideoPath(videoPath);
-        final String finalVideoPath = videoPath;
+        giftView.setVideoPath(giftBean.path);
+        final GiftBean finalGiftBean = giftBean;
         giftView.setOnTextureListener(new GiftView.OnTextureListener() {
             @Override
             public void onCompleted() {
@@ -148,7 +96,7 @@ public class GiftViewPlayer extends FrameLayout {
                     @Override
                     public void run() {
                         if (mGiftViewPlayerInterface != null) {
-                            mGiftViewPlayerInterface.onCompleted(finalVideoPath);
+                            mGiftViewPlayerInterface.onCompleted(finalGiftBean);
                         }
                         GiftViewPlayer.this.removeView(giftView);
                         setPlayParam();
@@ -159,9 +107,9 @@ public class GiftViewPlayer extends FrameLayout {
             @Override
             public void onTextureAvailable() {
                 if (mGiftViewPlayerInterface != null) {
-                    mGiftViewPlayerInterface.onTextureAvailable(finalVideoPath);
+                    mGiftViewPlayerInterface.onTextureAvailable(finalGiftBean);
                 }
-                giftView.playAnim(isResource,isMediaPlayer);
+                giftView.playAnim(finalGiftBean.isResource, finalGiftBean.isMediaPlayer);
             }
 
             @Override
@@ -170,7 +118,7 @@ public class GiftViewPlayer extends FrameLayout {
                     @Override
                     public void run() {
                         if (mGiftViewPlayerInterface != null) {
-                            mGiftViewPlayerInterface.onFail(finalVideoPath);
+                            mGiftViewPlayerInterface.onFail(finalGiftBean);
                         }
                         GiftViewPlayer.this.removeView(giftView);
                         setPlayParam();
@@ -194,10 +142,10 @@ public class GiftViewPlayer extends FrameLayout {
     }
 
     public interface GiftViewPlayerInterface {
-        void onCompleted(String path);
+        void onCompleted(GiftBean giftBean);
 
-        void onTextureAvailable(String path);
+        void onTextureAvailable(GiftBean giftBean);
 
-        void onFail(String path);
+        void onFail(GiftBean giftBean);
     }
 }
