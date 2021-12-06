@@ -84,7 +84,7 @@ public class GiftViewPlayer extends FrameLayout {
         if (!giftQueue.isEmpty()) {
             giftBean = giftQueue.removeFirst();
         }
-        if (giftBean == null || giftBean.path.length() == 0) {
+        if (giftBean == null || giftBean.path == null || giftBean.path.length() == 0) {
             return;
         }
         giftView.setVideoPath(giftBean.path);
