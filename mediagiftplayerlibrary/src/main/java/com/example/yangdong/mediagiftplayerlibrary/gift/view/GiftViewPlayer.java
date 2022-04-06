@@ -2,6 +2,7 @@ package com.example.yangdong.mediagiftplayerlibrary.gift.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.FrameLayout;
 
 import com.example.yangdong.mediagiftplayerlibrary.gift.bean.GiftBean;
@@ -92,38 +93,52 @@ public class GiftViewPlayer extends FrameLayout {
         giftView.setOnTextureListener(new GiftView.OnTextureListener() {
             @Override
             public void onCompleted() {
-                getRootView().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mGiftViewPlayerInterface != null) {
-                            mGiftViewPlayerInterface.onCompleted(finalGiftBean);
+                try {
+                    getRootView().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mGiftViewPlayerInterface != null) {
+                                mGiftViewPlayerInterface.onCompleted(finalGiftBean);
+                            }
+                            GiftViewPlayer.this.removeView(giftView);
+                            setPlayParam();
                         }
-                        GiftViewPlayer.this.removeView(giftView);
-                        setPlayParam();
-                    }
-                });
+                    });
+                }catch (Exception e) {
+                    Log.e("yd","onCompleted" + e.getMessage());
+                }
+
             }
 
             @Override
             public void onTextureAvailable() {
-                if (mGiftViewPlayerInterface != null) {
-                    mGiftViewPlayerInterface.onTextureAvailable(finalGiftBean);
+                try {
+                    if (mGiftViewPlayerInterface != null) {
+                        mGiftViewPlayerInterface.onTextureAvailable(finalGiftBean);
+                    }
+                    giftView.playAnim(finalGiftBean.isResource, finalGiftBean.isMediaPlayer);
+                }catch (Exception e) {
+                    Log.e("yd","onTextureAvailable" + e.getMessage());
                 }
-                giftView.playAnim(finalGiftBean.isResource, finalGiftBean.isMediaPlayer);
             }
 
             @Override
             public void onFail() {
-                getRootView().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mGiftViewPlayerInterface != null) {
-                            mGiftViewPlayerInterface.onFail(finalGiftBean);
+                try {
+                    getRootView().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mGiftViewPlayerInterface != null) {
+                                mGiftViewPlayerInterface.onFail(finalGiftBean);
+                            }
+                            GiftViewPlayer.this.removeView(giftView);
+                            setPlayParam();
                         }
-                        GiftViewPlayer.this.removeView(giftView);
-                        setPlayParam();
-                    }
-                });
+                    });
+                }catch (Exception e) {
+                    Log.e("yd","onFail" + e.getMessage());
+                }
+
             }
         });
 
