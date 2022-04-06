@@ -97,7 +97,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
 
     }
 
-    public void playAnim(boolean isResource,boolean isMediaPlayer) {
+    public void playAnim(boolean isResource, boolean isMediaPlayer) {
         if (videoRenderer == null) {
             return;
         }
@@ -196,35 +196,41 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                 } else {
                     extractor.setDataSource(filePath);
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            for (int i = 0; i < extractor.getTrackCount(); i++) {
-                MediaFormat format = extractor.getTrackFormat(i);
-                String mime = format.getString(MediaFormat.KEY_MIME);
-                if (mime.startsWith("video/")) {
-                    extractor.selectTrack(i);
-                    try {
-                        decoder = MediaCodec.createDecoderByType(mime);
-                        decoder.configure(format, surface, null, 0);
-                        break;
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                for (int i = 0; i < extractor.getTrackCount(); i++) {
+                    MediaFormat format = extractor.getTrackFormat(i);
+                    if (surfaceWidth != 0 && surfaceHeight > 0) {
+                        format.setInteger(MediaFormat.KEY_MAX_WIDTH, surfaceWidth);
+                        format.setInteger(MediaFormat.KEY_MAX_HEIGHT, surfaceHeight);
+                        format.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, surfaceWidth * surfaceHeight);
+                    }
+                    String mime = format.getString(MediaFormat.KEY_MIME);
+                    if (mime.startsWith("video/")) {
+                        extractor.selectTrack(i);
+                        try {
+                            decoder = MediaCodec.createDecoderByType(mime);
+                            decoder.configure(format, surface, null, 0);
+                            break;
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
-            }
 
-            if (decoder == null) {
-                Log.e(TAG, "Can't find video info!");
-                if (onTextureListener != null) {
-                    onTextureListener.onFail();
+                if (decoder == null) {
+                    Log.e(TAG, "Can't find video info!");
+                    if (onTextureListener != null) {
+                        onTextureListener.onFail();
+                    }
+                    return;
                 }
-                return;
+
+                decoder.start();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            decoder.start();
-
             ByteBuffer[] inputBuffers = decoder.getInputBuffers();
             ByteBuffer[] outputBuffers = decoder.getOutputBuffers();
             MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
