@@ -198,7 +198,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                 }
                 for (int i = 0; i < extractor.getTrackCount(); i++) {
                     MediaFormat format = extractor.getTrackFormat(i);
-                    if (surfaceWidth != 0 && surfaceHeight > 0) {
+                    if (surfaceWidth > 0 && surfaceHeight > 0) {
                         format.setInteger(MediaFormat.KEY_MAX_WIDTH, surfaceWidth);
                         format.setInteger(MediaFormat.KEY_MAX_HEIGHT, surfaceHeight);
                         format.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, surfaceWidth * surfaceHeight);
