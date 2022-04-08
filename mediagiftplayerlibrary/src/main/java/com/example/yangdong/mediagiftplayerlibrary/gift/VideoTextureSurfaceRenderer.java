@@ -65,22 +65,32 @@ public class VideoTextureSurfaceRenderer extends TextureSurfaceRenderer implemen
     }
 
     private void setupGraphics() {
-        final String vertexShader = RawResourceReader.readTextFileFromRawResource(context, R.raw.vetext_sharder_anim);
-        final String fragmentShader = RawResourceReader.readTextFileFromRawResource(context, R.raw.fragment_sharder_anim);
+        try {
 
-        final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, vertexShader);
-        final int fragmentShaderHandle = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, fragmentShader);
-        shaderProgram = ShaderHelper.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle,
-                new String[]{"texture", "vPosition", "vTexCoordinate", "textureTransform"});
+            final String vertexShader = RawResourceReader.readTextFileFromRawResource(context, R.raw.vetext_sharder_anim);
+            final String fragmentShader = RawResourceReader.readTextFileFromRawResource(context, R.raw.fragment_sharder_anim);
 
-        isYUV = GLES20.glGetUniformLocation(shaderProgram, "isYUV");
-        texture = GLES20.glGetUniformLocation(shaderProgram, "texture");
-        s_texture_2D_y = GLES20.glGetUniformLocation(shaderProgram, "s_texture_2D_Y");
-        s_texture_2D_u = GLES20.glGetUniformLocation(shaderProgram, "s_texture_2D_U");
-        s_texture_2D_v = GLES20.glGetUniformLocation(shaderProgram, "s_texture_2D_V");
-        vTexCoordinateAlpha = GLES20.glGetAttribLocation(shaderProgram, "vTexCoordinateAlpha");
-        vTexCoordinateRgb = GLES20.glGetAttribLocation(shaderProgram, "vTexCoordinateRgb");
-        vPosition = GLES20.glGetAttribLocation(shaderProgram, "vPosition");
+            final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, vertexShader);
+            final int fragmentShaderHandle = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, fragmentShader);
+            shaderProgram = ShaderHelper.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle,
+                    new String[]{"texture", "vPosition", "vTexCoordinate", "textureTransform"});
+
+            //验证opengl对象
+            ShaderHelper.volidateProgram(shaderProgram);
+            //使用程序
+            GLES20.glUseProgram(shaderProgram);
+
+            isYUV = GLES20.glGetUniformLocation(shaderProgram, "isYUV");
+            texture = GLES20.glGetUniformLocation(shaderProgram, "texture");
+            s_texture_2D_y = GLES20.glGetUniformLocation(shaderProgram, "s_texture_2D_Y");
+            s_texture_2D_u = GLES20.glGetUniformLocation(shaderProgram, "s_texture_2D_U");
+            s_texture_2D_v = GLES20.glGetUniformLocation(shaderProgram, "s_texture_2D_V");
+            vTexCoordinateAlpha = GLES20.glGetAttribLocation(shaderProgram, "vTexCoordinateAlpha");
+            vTexCoordinateRgb = GLES20.glGetAttribLocation(shaderProgram, "vTexCoordinateRgb");
+            vPosition = GLES20.glGetAttribLocation(shaderProgram, "vPosition");
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
 
     }
 
