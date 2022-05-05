@@ -15,7 +15,6 @@ import android.view.Surface;
 import android.view.TextureView;
 
 import com.example.yangdong.mediagiftplayerlibrary.gift.VideoTextureSurfaceRenderer;
-import com.example.yangdong.mediagiftplayerlibrary.gift.utils.SystemUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +26,6 @@ import java.nio.ByteBuffer;
 public class GiftView extends TextureView implements TextureView.SurfaceTextureListener, SurfaceTexture.OnFrameAvailableListener, MediaPlayer.OnPreparedListener {
 
     private static String TAG = "yd";
-    private boolean isPlaying;
     private PlayerThread playerThread;
     private VideoTextureSurfaceRenderer videoRenderer;
     private String videoPath;
@@ -88,7 +86,6 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
         if (playerThread != null) {
             playerThread.interrupt();
         }
-        isPlaying = false;
         return false;
     }
 
@@ -101,7 +98,6 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
         if (videoRenderer == null) {
             return;
         }
-        isPlaying = true;
         Surface surface = new Surface(videoRenderer.getVideoTexture());
         if (isMediaPlayer) {
             playMediaPlayer(surface);
@@ -189,6 +185,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
         @Override
         public void run() {
             MediaCodec decoder = null;
+            MediaFormat outputFormat = null;
             MediaExtractor extractor = new MediaExtractor();
             try {
                 if (context != null) {
@@ -206,13 +203,10 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                     String mime = format.getString(MediaFormat.KEY_MIME);
                     if (mime.startsWith("video/")) {
                         extractor.selectTrack(i);
-                        try {
-                            decoder = MediaCodec.createDecoderByType(mime);
-                            decoder.configure(format, surface, null, 0);
-                            break;
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        decoder = MediaCodec.createDecoderByType(mime);
+                        decoder.configure(format, surface, null, 0);
+                        outputFormat = decoder.getOutputFormat();
+                        break;
                     }
                 }
 
@@ -223,86 +217,55 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                     }
                     return;
                 }
-
                 decoder.start();
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            ByteBuffer[] inputBuffers = decoder.getInputBuffers();
-            ByteBuffer[] outputBuffers = decoder.getOutputBuffers();
-            MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
-            boolean isEOS = false;
-            long startMs = System.currentTimeMillis();
-
-            while (!Thread.interrupted()) {
-                if (!isEOS) {
-                    //1 准备填充器
-                    int inIndex = -1;
-                    try {
-                        inIndex = decoder.dequeueInputBuffer(10000);
-                    } catch (IllegalStateException e) {
-                        e.printStackTrace();
-                        Log.e(TAG, "IllegalStateException dequeueInputBuffer ");
-                    }
-                    if (inIndex >= 0) {
-                        ByteBuffer buffer = inputBuffers[inIndex];
-                        int sampleSize = extractor.readSampleData(buffer, 0);
-                        if (sampleSize < 0) {
-                            Log.d(TAG, "InputBuffer BUFFER_FLAG_END_OF_STREAM");
-                            decoder.queueInputBuffer(inIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
-                            isEOS = true;
-                        } else {
-                            decoder.queueInputBuffer(inIndex, 0, sampleSize, extractor.getSampleTime(), 0);
-                            extractor.advance();
-                        }
-                    }
-                }
-                //4 开始解码
-                int outIndex = MediaCodec.INFO_TRY_AGAIN_LATER;
-                try {
-                    outIndex = decoder.dequeueOutputBuffer(info, 10000);
-                } catch (IllegalStateException e) {
-                    e.printStackTrace();
-                    Log.e(TAG, "IllegalStateException dequeueOutputBuffer " + e.getMessage());
-                }
-                switch (outIndex) {
-                    case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
-                        Log.d(TAG, "INFO_OUTPUT_BUFFERS_CHANGED");
-                        outputBuffers = decoder.getOutputBuffers();
-                        break;
-                    case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
-                        Log.d(TAG, "New format " + decoder.getOutputFormat());
-                        break;
-                    case MediaCodec.INFO_TRY_AGAIN_LATER:
-                        Log.d(TAG, "dequeueOutputBuffer timed out!");
-                        break;
-                    default:
-                        ByteBuffer buffer = outputBuffers[outIndex];
-//                        Log.v(TAG, "We can't use this buffer but render it due to the API limit, " + buffer);
-
-                        // We use a very simple clock to keep the video FPS, or the video
-                        // playback will be too fast
-                        while (info.presentationTimeUs / 1000 > System.currentTimeMillis() - startMs) {
-                            try {
-                                sleep(10);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                                break;
+                boolean isEOS = false;
+                long startMs = System.currentTimeMillis();
+                MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+                while (!Thread.interrupted()) {
+                    if (!isEOS) {
+                        //1 准备填充器
+                        int inIndex = -1;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            inIndex = decoder.dequeueInputBuffer(10000);
+                            if (inIndex >= 0) {
+                                ByteBuffer buffer = decoder.getInputBuffer(inIndex);
+                                int sampleSize = extractor.readSampleData(buffer, 0);
+                                if (sampleSize < 0) {
+                                    Log.d(TAG, "InputBuffer BUFFER_FLAG_END_OF_STREAM");
+                                    decoder.queueInputBuffer(inIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                                    isEOS = true;
+                                } else {
+                                    decoder.queueInputBuffer(inIndex, 0, sampleSize, extractor.getSampleTime(), 0);
+                                    extractor.advance();
+                                }
+                            }
+                            //4 开始解码
+                            int outIndex = decoder.dequeueOutputBuffer(info, 10000);
+                            if (outIndex >= 0) {
+                                ByteBuffer outputBuffers = decoder.getOutputBuffer(outIndex);
+                                MediaFormat bufferFormat = decoder.getOutputFormat(outIndex); // option A
+                                while (info.presentationTimeUs / 1000 > System.currentTimeMillis() - startMs) {
+                                    sleep(10);
+                                }
+                                decoder.releaseOutputBuffer(outIndex, true);
+                            } else if (outIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                                outputFormat = decoder.getOutputFormat(); // option B
                             }
                         }
-                        decoder.releaseOutputBuffer(outIndex, true);
+                    }
+                    if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                        Log.e(TAG, "OutputBuffer BUFFER_FLAG_END_OF_STREAM");
                         break;
+                    }
                 }
 
-                // All decoded frames have been rendered, we can stop playing now
-                if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-                    Log.e(TAG, "OutputBuffer BUFFER_FLAG_END_OF_STREAM");
-
-                    break;
-                }
+            } catch (IOException e) {
+                Log.e(TAG, "GiftView decoder " + e.getMessage());
+                e.printStackTrace();
+            } catch (Exception e) {
+                Log.e(TAG, "GiftView decoder "+ e.getMessage());
+                e.printStackTrace();
             }
             try {
                 decoder.stop();
@@ -312,7 +275,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                 decoder.release();
                 extractor.release();
             }
-            isPlaying = false;
+
             if (videoRenderer != null) {
                 playerThread.interrupt();
                 videoRenderer.onPause();
