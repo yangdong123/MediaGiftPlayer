@@ -226,33 +226,34 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                     if (!isEOS) {
                         //1 准备填充器
                         int inIndex = -1;
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            inIndex = decoder.dequeueInputBuffer(10000);
-                            if (inIndex >= 0) {
-                                ByteBuffer buffer = decoder.getInputBuffer(inIndex);
-                                int sampleSize = extractor.readSampleData(buffer, 0);
-                                if (sampleSize < 0) {
-                                    Log.d(TAG, "InputBuffer BUFFER_FLAG_END_OF_STREAM");
-                                    decoder.queueInputBuffer(inIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
-                                    isEOS = true;
-                                } else {
-                                    decoder.queueInputBuffer(inIndex, 0, sampleSize, extractor.getSampleTime(), 0);
-                                    extractor.advance();
-                                }
+                        inIndex = decoder.dequeueInputBuffer(10000);
+                        if (inIndex >= 0) {
+                            ByteBuffer buffer = null;
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                                buffer = decoder.getInputBuffer(inIndex);
                             }
-                            //4 开始解码
-                            int outIndex = decoder.dequeueOutputBuffer(info, 10000);
-                            if (outIndex >= 0) {
-                                ByteBuffer outputBuffers = decoder.getOutputBuffer(outIndex);
-                                MediaFormat bufferFormat = decoder.getOutputFormat(outIndex); // option A
-                                while (info.presentationTimeUs / 1000 > System.currentTimeMillis() - startMs) {
-                                    sleep(10);
-                                }
-                                decoder.releaseOutputBuffer(outIndex, true);
-                            } else if (outIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                                outputFormat = decoder.getOutputFormat(); // option B
+                            int sampleSize = extractor.readSampleData(buffer, 0);
+                            if (sampleSize < 0) {
+                                Log.d(TAG, "InputBuffer BUFFER_FLAG_END_OF_STREAM");
+                                decoder.queueInputBuffer(inIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                                isEOS = true;
+                            } else {
+                                decoder.queueInputBuffer(inIndex, 0, sampleSize, extractor.getSampleTime(), 0);
+                                extractor.advance();
                             }
                         }
+                    }
+                    //4 开始解码
+                    int outIndex = decoder.dequeueOutputBuffer(info, 10000);
+                    if (outIndex >= 0) {
+//                        ByteBuffer outputBuffers = decoder.getOutputBuffer(outIndex);
+//                        MediaFormat bufferFormat = decoder.getOutputFormat(outIndex); // option A
+                        while (info.presentationTimeUs / 1000 > System.currentTimeMillis() - startMs) {
+                            sleep(10);
+                        }
+                        decoder.releaseOutputBuffer(outIndex, true);
+                    } else if (outIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                        outputFormat = decoder.getOutputFormat(); // option B
                     }
                     if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                         Log.e(TAG, "OutputBuffer BUFFER_FLAG_END_OF_STREAM");
@@ -264,7 +265,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                 Log.e(TAG, "GiftView decoder " + e.getMessage());
                 e.printStackTrace();
             } catch (Exception e) {
-                Log.e(TAG, "GiftView decoder "+ e.getMessage());
+                Log.e(TAG, "GiftView decoder " + e.getMessage());
                 e.printStackTrace();
             }
             try {
