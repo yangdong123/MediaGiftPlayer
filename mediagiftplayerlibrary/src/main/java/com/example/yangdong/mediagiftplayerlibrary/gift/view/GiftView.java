@@ -227,7 +227,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                         //1 准备填充器
                         int inIndex = -1;
                         inIndex = decoder.dequeueInputBuffer(10000);
-                        if (inIndex >= 0) {
+                        if (inIndex >= 0 && decoder !=null) {
                             ByteBuffer buffer = null;
                             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                                 buffer = decoder.getInputBuffer(inIndex);
@@ -273,8 +273,12 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
             } catch (Exception e) {
                 Log.e(TAG, "IllegalStateException decoder.stop ");
             } finally {
-                decoder.release();
-                extractor.release();
+                if (decoder != null) {
+                    decoder.release();
+                }
+                if (extractor != null) {
+                    extractor.release();
+                }
             }
 
             if (videoRenderer != null) {
