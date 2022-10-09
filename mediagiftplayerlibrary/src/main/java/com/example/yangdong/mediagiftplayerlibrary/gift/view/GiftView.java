@@ -3,6 +3,7 @@ package com.example.yangdong.mediagiftplayerlibrary.gift.view;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.media.MediaCodec;
+import android.media.MediaCodecInfo;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaPlayer;
@@ -196,9 +197,10 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                 for (int i = 0; i < extractor.getTrackCount(); i++) {
                     MediaFormat format = extractor.getTrackFormat(i);
                     if (surfaceWidth > 0 && surfaceHeight > 0) {
-                        format.setInteger(MediaFormat.KEY_MAX_WIDTH, surfaceWidth);
-                        format.setInteger(MediaFormat.KEY_MAX_HEIGHT, surfaceHeight);
+                        format.setInteger(MediaFormat.KEY_WIDTH, surfaceWidth);
+                        format.setInteger(MediaFormat.KEY_HEIGHT, surfaceHeight);
                         format.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, surfaceWidth * surfaceHeight);
+                        format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
                     }
                     String mime = format.getString(MediaFormat.KEY_MIME);
                     if (mime.startsWith("video/")) {
