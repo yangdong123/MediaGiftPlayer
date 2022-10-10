@@ -96,17 +96,24 @@ public class VideoTextureSurfaceRenderer extends TextureSurfaceRenderer implemen
 
     private void setupVertexBuffer() {
         ByteBuffer dlb = ByteBuffer.allocateDirect(drawOrder.length * 2);
-        dlb.order(ByteOrder.nativeOrder());
-        drawListBuffer = dlb.asShortBuffer();
-        drawListBuffer.put(drawOrder);
-        drawListBuffer.position(0);
+        if (dlb != null) {
+            dlb.order(ByteOrder.nativeOrder());
+            drawListBuffer = dlb.asShortBuffer();
+        }
+        if (drawListBuffer != null) {
+            drawListBuffer.put(drawOrder);
+            drawListBuffer.position(0);
+        }
 
         ByteBuffer bb = ByteBuffer.allocateDirect(squareCoords.length * 4);
-        bb.order(ByteOrder.nativeOrder());
-
-        vertexBuffer = bb.asFloatBuffer();
-        vertexBuffer.put(squareCoords);
-        vertexBuffer.position(0);
+        if (bb != null) {
+            bb.order(ByteOrder.nativeOrder());
+            vertexBuffer = bb.asFloatBuffer();
+        }
+        if (vertexBuffer != null) {
+            vertexBuffer.put(squareCoords);
+            vertexBuffer.position(0);
+        }
 
 
     }
@@ -119,16 +126,24 @@ public class VideoTextureSurfaceRenderer extends TextureSurfaceRenderer implemen
         float[] floatRgb = setupTexturelocation == 1 ? textureBufferQ : textureBufferT;
         float[] floatAlpha = setupTexturelocation == 1 ? textureBufferP : textureBufferS;
         ByteBuffer v2 = ByteBuffer.allocateDirect(floatAlpha.length * 4);
-        v2.order(ByteOrder.nativeOrder());
-        floatBufferAlpha = v2.asFloatBuffer();
-        floatBufferAlpha.put(floatAlpha);
-        floatBufferAlpha.position(0);
+        if (v2 != null) {
+            v2.order(ByteOrder.nativeOrder());
+            floatBufferAlpha = v2.asFloatBuffer();
+        }
+        if (floatBufferAlpha != null) {
+            floatBufferAlpha.put(floatAlpha);
+            floatBufferAlpha.position(0);
+        }
 
-        ByteBuffer v1_1 = ByteBuffer.allocateDirect(floatRgb.length * 4);
-        v1_1.order(ByteOrder.nativeOrder());
-        floatBufferRgb = v1_1.asFloatBuffer();
-        floatBufferRgb.put(floatRgb);
-        floatBufferRgb.position(0);
+        ByteBuffer v1 = ByteBuffer.allocateDirect(floatRgb.length * 4);
+        if (v1 != null) {
+            v1.order(ByteOrder.nativeOrder());
+            floatBufferRgb = v1.asFloatBuffer();
+        }
+        if (floatBufferRgb != null) {
+            floatBufferRgb.put(floatRgb);
+            floatBufferRgb.position(0);
+        }
 
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
