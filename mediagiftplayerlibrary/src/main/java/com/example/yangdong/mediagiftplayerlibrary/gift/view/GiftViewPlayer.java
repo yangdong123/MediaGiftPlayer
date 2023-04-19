@@ -97,6 +97,7 @@ public class GiftViewPlayer extends FrameLayout {
             @Override
             public void onCompleted() {
                 try {
+
                     getRootView().post(new Runnable() {
                         @Override
                         public void run() {
