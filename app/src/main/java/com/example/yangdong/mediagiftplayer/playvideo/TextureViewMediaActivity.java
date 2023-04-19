@@ -112,27 +112,29 @@ public class TextureViewMediaActivity extends Activity implements TextureView.Su
     private void initMediaPlayer() {
         try {
             this.mediaPlayer = new MediaPlayer();
-
-            while (videoRenderer.getVideoTexture() == null) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            if(videoRenderer != null) {
+                while (videoRenderer.getVideoTexture() == null) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+
+                Surface surface = new Surface(videoRenderer.getVideoTexture());
+                if (!new File(videoPath).exists()) {
+                    showErrorMessage("视频不存在");
+                }
+                mediaPlayer.setDataSource(videoPath);
+                mediaPlayer.setSurface(surface);
+
+                surface.release();
+
+                mediaPlayer.prepareAsync();
+                mediaPlayer.setOnPreparedListener(this);
+                mediaPlayer.setLooping(true);
             }
 
-            Surface surface = new Surface(videoRenderer.getVideoTexture());
-            if (!new File(videoPath).exists()) {
-                showErrorMessage("视频不存在");
-            }
-            mediaPlayer.setDataSource(videoPath);
-            mediaPlayer.setSurface(surface);
-
-            surface.release();
-
-            mediaPlayer.prepareAsync();
-            mediaPlayer.setOnPreparedListener(this);
-            mediaPlayer.setLooping(true);
         } catch (IllegalArgumentException e1) {
             e1.printStackTrace();
             showErrorMessage(e1.getMessage());

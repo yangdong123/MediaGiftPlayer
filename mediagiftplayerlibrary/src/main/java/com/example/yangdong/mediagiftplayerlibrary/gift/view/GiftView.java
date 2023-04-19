@@ -20,6 +20,9 @@ import com.example.yangdong.mediagiftplayerlibrary.gift.VideoTextureSurfaceRende
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by MrDong on 2019/2/11.
@@ -85,7 +88,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
         if (playerThread != null) {
-            playerThread.interrupt();
+            Thread.interrupted();
         }
         return false;
     }
@@ -95,7 +98,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
 
     }
 
-    public void playAnim(boolean isResource, boolean isMediaPlayer) {
+    public void playAnim(ExecutorService singleThreadPool, boolean isResource, boolean isMediaPlayer) {
         if (videoRenderer == null) {
             return;
         }
@@ -104,11 +107,10 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
             playMediaPlayer(surface);
         } else {
             if (isResource) {
-                playerThread = new PlayerThread(getContext().getApplicationContext(), surface, videoPath);
+                playerThread = new PlayerThread(singleThreadPool, getContext().getApplicationContext(), surface, videoPath);
             } else {
-                playerThread = new PlayerThread(surface, videoPath);
+                playerThread = new PlayerThread(singleThreadPool, surface, videoPath);
             }
-            playerThread.start();
         }
     }
 
@@ -166,134 +168,147 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
         }
     }
 
-    private class PlayerThread extends Thread {
+    private class PlayerThread {
         private Context context;
         private Surface surface;
         private String filePath;
 
-        public PlayerThread(Surface surface, String filePath) {
+        public PlayerThread(ExecutorService singleThreadPool, Surface surface, String filePath) {
             this.surface = surface;
             this.filePath = filePath;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                run(singleThreadPool);
+            }
         }
 
-        public PlayerThread(Context context, Surface surface, String filePath) {
+        public PlayerThread(ExecutorService singleThreadPool, Context context, Surface surface, String filePath) {
             this.context = context;
             this.surface = surface;
             this.filePath = filePath;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                run(singleThreadPool);
+            }
         }
 
+
         @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-        @Override
-        public void run() {
-            MediaCodec decoder = null;
-            MediaFormat outputFormat = null;
-            MediaExtractor extractor = new MediaExtractor();
-            try {
-                if (context != null) {
-                    extractor.setDataSource(context, Uri.parse(filePath), null);
-                } else {
-                    extractor.setDataSource(filePath);
-                }
-                for (int i = 0; i < extractor.getTrackCount(); i++) {
-                    MediaFormat format = extractor.getTrackFormat(i);
-                    if (surfaceWidth > 0 && surfaceHeight > 0) {
-                        format.setInteger(MediaFormat.KEY_WIDTH, surfaceWidth);
-                        format.setInteger(MediaFormat.KEY_HEIGHT, surfaceHeight);
-                        format.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, surfaceWidth * surfaceHeight);
-                        format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
-                    }
-                    String mime = format.getString(MediaFormat.KEY_MIME);
-                    if (mime.startsWith("video/")) {
-                        extractor.selectTrack(i);
-                        decoder = MediaCodec.createDecoderByType(mime);
-                        decoder.configure(format, surface, null, 0);
-                        outputFormat = decoder.getOutputFormat();
-                        break;
-                    }
-                }
-
-                if (decoder == null) {
-                    Log.e(TAG, "Can't find video info!");
-                    if (onTextureListener != null) {
-                        onTextureListener.onFail();
-                    }
-                    return;
-                }
-                decoder.start();
-
-                boolean isEOS = false;
-                long startMs = System.currentTimeMillis();
-                MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
-                while (!Thread.interrupted()) {
-                    if (!isEOS) {
-                        //1 准备填充器
-                        int inIndex = -1;
-                        inIndex = decoder.dequeueInputBuffer(10000);
-                        if (inIndex >= 0 && decoder !=null) {
-                            ByteBuffer buffer = null;
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                                buffer = decoder.getInputBuffer(inIndex);
+        public void run(ExecutorService singleThreadPool) {
+            singleThreadPool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    Log.e(TAG, "线程："+Thread.currentThread().getName());
+                    MediaCodec decoder = null;
+                    MediaFormat outputFormat = null;
+                    MediaExtractor extractor = new MediaExtractor();
+                    try {
+                        if (context != null) {
+                            extractor.setDataSource(context, Uri.parse(filePath), null);
+                        } else {
+                            extractor.setDataSource(filePath);
+                        }
+                        for (int i = 0; i < extractor.getTrackCount(); i++) {
+                            MediaFormat format = extractor.getTrackFormat(i);
+                            if (surfaceWidth > 0 && surfaceHeight > 0) {
+                                format.setInteger(MediaFormat.KEY_WIDTH, surfaceWidth);
+                                format.setInteger(MediaFormat.KEY_HEIGHT, surfaceHeight);
+                                format.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, surfaceWidth * surfaceHeight);
+                                format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
                             }
-                            int sampleSize = extractor.readSampleData(buffer, 0);
-                            if (sampleSize < 0) {
-                                Log.d(TAG, "InputBuffer BUFFER_FLAG_END_OF_STREAM");
-                                decoder.queueInputBuffer(inIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
-                                isEOS = true;
-                            } else {
-                                decoder.queueInputBuffer(inIndex, 0, sampleSize, extractor.getSampleTime(), 0);
-                                extractor.advance();
+                            String mime = format.getString(MediaFormat.KEY_MIME);
+                            if (mime.startsWith("video/")) {
+                                extractor.selectTrack(i);
+                                decoder = MediaCodec.createDecoderByType(mime);
+                                decoder.configure(format, surface, null, 0);
+                                outputFormat = decoder.getOutputFormat();
+                                break;
                             }
                         }
-                    }
-                    //4 开始解码
-                    int outIndex = decoder.dequeueOutputBuffer(info, 10000);
-                    if (outIndex >= 0) {
+
+                        if (decoder == null) {
+                            Log.e(TAG, "Can't find video info!");
+                            if (onTextureListener != null) {
+                                onTextureListener.onFail();
+                            }
+                            return;
+                        }
+                        decoder.start();
+
+                        boolean isEOS = false;
+                        long startMs = System.currentTimeMillis();
+                        MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+                        while (!Thread.interrupted()) {
+                            if (!isEOS) {
+                                //1 准备填充器
+                                int inIndex = -1;
+                                inIndex = decoder.dequeueInputBuffer(10000);
+                                if (inIndex >= 0 && decoder != null) {
+                                    ByteBuffer buffer = null;
+                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                                        buffer = decoder.getInputBuffer(inIndex);
+                                    }
+                                    int sampleSize = extractor.readSampleData(buffer, 0);
+                                    if (sampleSize < 0) {
+                                        Log.d(TAG, "InputBuffer BUFFER_FLAG_END_OF_STREAM");
+                                        decoder.queueInputBuffer(inIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                                        isEOS = true;
+                                    } else {
+                                        decoder.queueInputBuffer(inIndex, 0, sampleSize, extractor.getSampleTime(), 0);
+                                        extractor.advance();
+                                    }
+                                }
+                            }
+                            //4 开始解码
+                            int outIndex = decoder.dequeueOutputBuffer(info, 10000);
+                            if (outIndex >= 0) {
 //                        ByteBuffer outputBuffers = decoder.getOutputBuffer(outIndex);
 //                        MediaFormat bufferFormat = decoder.getOutputFormat(outIndex); // option A
-                        while (info.presentationTimeUs / 1000 > System.currentTimeMillis() - startMs) {
-                            sleep(10);
+                                while (info.presentationTimeUs / 1000 > System.currentTimeMillis() - startMs) {
+                                    Thread.sleep(10);
+                                }
+                                decoder.releaseOutputBuffer(outIndex, true);
+                            } else if (outIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                                outputFormat = decoder.getOutputFormat(); // option B
+                            }
+                            if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                                Log.e(TAG, "OutputBuffer BUFFER_FLAG_END_OF_STREAM");
+                                break;
+                            }
                         }
-                        decoder.releaseOutputBuffer(outIndex, true);
-                    } else if (outIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                        outputFormat = decoder.getOutputFormat(); // option B
+
+                    } catch (IOException e) {
+                        Log.e(TAG, "GiftView decoder " + e.getMessage());
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        Log.e(TAG, "GiftView decoder " + e.getMessage());
+                        e.printStackTrace();
                     }
-                    if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-                        Log.e(TAG, "OutputBuffer BUFFER_FLAG_END_OF_STREAM");
-                        break;
+                    try {
+                        decoder.stop();
+                    } catch (Exception e) {
+                        Log.e(TAG, "IllegalStateException decoder.stop ");
+                    } finally {
+                        if (decoder != null) {
+                            decoder.release();
+                        }
+                        if (extractor != null) {
+                            extractor.release();
+                        }
+                    }
+
+                    if (videoRenderer != null) {
+                        Thread.interrupted();
+                        videoRenderer.onPause();
+                        videoRenderer = null;
+                    }
+                    if (onTextureListener != null) {
+                        onTextureListener.onCompleted();
+                        surface.release();
+                        setSurfaceTextureListener(null);
+
                     }
                 }
+            });
 
-            } catch (IOException e) {
-                Log.e(TAG, "GiftView decoder " + e.getMessage());
-                e.printStackTrace();
-            } catch (Exception e) {
-                Log.e(TAG, "GiftView decoder " + e.getMessage());
-                e.printStackTrace();
-            }
-            try {
-                decoder.stop();
-            } catch (Exception e) {
-                Log.e(TAG, "IllegalStateException decoder.stop ");
-            } finally {
-                if (decoder != null) {
-                    decoder.release();
-                }
-                if (extractor != null) {
-                    extractor.release();
-                }
-            }
-
-            if (videoRenderer != null) {
-                playerThread.interrupt();
-                videoRenderer.onPause();
-                videoRenderer = null;
-            }
-            if (onTextureListener != null) {
-                onTextureListener.onCompleted();
-                surface.release();
-                setSurfaceTextureListener(null);
-
-            }
         }
     }
 
