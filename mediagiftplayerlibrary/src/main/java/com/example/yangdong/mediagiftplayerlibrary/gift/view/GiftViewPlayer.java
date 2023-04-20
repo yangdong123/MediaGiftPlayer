@@ -7,6 +7,7 @@ import android.widget.FrameLayout;
 
 import com.example.yangdong.mediagiftplayerlibrary.gift.bean.GiftBean;
 
+import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,7 +19,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public class GiftViewPlayer extends FrameLayout {
     private int childViewCount;
     private GiftViewPlayerInterface mGiftViewPlayerInterface;
-    private ExecutorService singleThreadPool = Executors.newCachedThreadPool();
+    private ExecutorService singleThreadPool;
     private LinkedList<GiftBean> giftQueue = new LinkedList<>();
 
     public GiftViewPlayer(Context context) {
@@ -41,6 +42,11 @@ public class GiftViewPlayer extends FrameLayout {
 
     public void setMaxChildView(int childViewCount) {
         this.childViewCount = childViewCount;
+        if (childViewCount == 1) {
+            singleThreadPool = Executors.newSingleThreadExecutor();
+        } else {
+            singleThreadPool = Executors.newCachedThreadPool();
+        }
     }
 
 
@@ -83,17 +89,21 @@ public class GiftViewPlayer extends FrameLayout {
             return;
         }
 
-        final GiftView giftView = new GiftView(getContext());
 
         if (!giftQueue.isEmpty()) {
             giftBean = giftQueue.removeFirst();
         }
         if (giftBean == null || giftBean.path == null || giftBean.path.length() == 0) {
+            removeAllViews();
             return;
         }
+
+        final WeakReference<GiftView> giftViewWeakReference = new WeakReference<>(new GiftView(getContext()));
+        final GiftView giftView = giftViewWeakReference.get();
         giftView.setVideoPath(giftBean.path);
         final GiftBean finalGiftBean = giftBean;
         giftView.setOnTextureListener(new GiftView.OnTextureListener() {
+
             @Override
             public void onCompleted() {
                 try {

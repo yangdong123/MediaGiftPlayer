@@ -19,6 +19,7 @@ import com.example.yangdong.mediagiftplayerlibrary.gift.VideoTextureSurfaceRende
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -102,7 +103,8 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
         if (videoRenderer == null) {
             return;
         }
-        Surface surface = new Surface(videoRenderer.getVideoTexture());
+        WeakReference<Surface> surfaceWeakReference = new WeakReference<>(new Surface(videoRenderer.getVideoTexture()));
+        Surface surface = surfaceWeakReference.get();
         if (isMediaPlayer) {
             playMediaPlayer(surface);
         } else {
@@ -121,7 +123,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
     }
 
 
-    private void playMediaPlayer(Surface surface) {
+    private void playMediaPlayer(final Surface surface) {
         try {
             if (mediaPlayer == null) {
                 this.mediaPlayer = new MediaPlayer();
@@ -129,7 +131,16 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                 mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mp) {
+                        mediaPlayer.stop();
+                        mediaPlayer.release();
+                        surface.release();
+                        if (videoRenderer != null) {
+                            Thread.interrupted();
+                            videoRenderer.onPause();
+                            videoRenderer = null;
+                        }
                         onTextureListener.onCompleted();
+
                     }
                 });
             }
@@ -196,7 +207,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
             singleThreadPool.execute(new Runnable() {
                 @Override
                 public void run() {
-                    Log.e(TAG, "线程："+Thread.currentThread().getName());
+                    Log.e(TAG, "线程：" + Thread.currentThread().getName());
                     MediaCodec decoder = null;
                     MediaFormat outputFormat = null;
                     MediaExtractor extractor = new MediaExtractor();
@@ -293,19 +304,21 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
                         if (extractor != null) {
                             extractor.release();
                         }
+
+                        if (videoRenderer != null) {
+                            Thread.interrupted();
+                            videoRenderer.onPause();
+                            videoRenderer = null;
+                        }
+                        if (onTextureListener != null) {
+                            onTextureListener.onCompleted();
+                            surface.release();
+                            setSurfaceTextureListener(null);
+
+                        }
                     }
 
-                    if (videoRenderer != null) {
-                        Thread.interrupted();
-                        videoRenderer.onPause();
-                        videoRenderer = null;
-                    }
-                    if (onTextureListener != null) {
-                        onTextureListener.onCompleted();
-                        surface.release();
-                        setSurfaceTextureListener(null);
 
-                    }
                 }
             });
 
@@ -341,6 +354,12 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
         super.onDetachedFromWindow();
         if (mediaPlayer != null) {
             mediaPlayer.release();
+        }
+        if (playerThread != null ) {
+            playerThread = null;
+        }
+        if (videoRenderer != null ) {
+            videoRenderer = null;
         }
     }
 }
