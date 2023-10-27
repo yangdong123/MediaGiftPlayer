@@ -229,7 +229,7 @@ public class VideoTextureSurfaceRenderer extends TextureSurfaceRenderer implemen
     @Override
     protected void initGLComponents() {
         //textures[0] OpenGL纹理对象名称
-        videoTexture = new SurfaceTexture(textures[0]);
+        videoTexture = new SurfaceTexture(0);
         videoTexture.setOnFrameAvailableListener(this);
         videoTexture.setDefaultBufferSize(width, height);
 
