@@ -100,7 +100,7 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
     }
 
     public void playAnim(ExecutorService singleThreadPool, boolean isResource, boolean isMediaPlayer) {
-        if (videoRenderer == null) {
+        if (videoRenderer == null || videoRenderer.getVideoTexture() == null) {
             return;
         }
         WeakReference<Surface> surfaceWeakReference = new WeakReference<>(new Surface(videoRenderer.getVideoTexture()));
@@ -355,10 +355,10 @@ public class GiftView extends TextureView implements TextureView.SurfaceTextureL
         if (mediaPlayer != null) {
             mediaPlayer.release();
         }
-        if (playerThread != null ) {
+        if (playerThread != null) {
             playerThread = null;
         }
-        if (videoRenderer != null ) {
+        if (videoRenderer != null) {
             videoRenderer = null;
         }
     }
