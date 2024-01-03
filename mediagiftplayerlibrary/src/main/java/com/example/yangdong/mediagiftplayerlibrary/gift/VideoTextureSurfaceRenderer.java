@@ -125,24 +125,28 @@ public class VideoTextureSurfaceRenderer extends TextureSurfaceRenderer implemen
     private void setupTexture(int setupTexturelocation) {
         float[] floatRgb = setupTexturelocation == 1 ? textureBufferQ : textureBufferT;
         float[] floatAlpha = setupTexturelocation == 1 ? textureBufferP : textureBufferS;
-        ByteBuffer v2 = ByteBuffer.allocateDirect(floatAlpha.length * 4);
-        if (v2 != null) {
-            v2.order(ByteOrder.nativeOrder());
-            floatBufferAlpha = v2.asFloatBuffer();
-        }
-        if (floatBufferAlpha != null) {
-            floatBufferAlpha.put(floatAlpha);
-            floatBufferAlpha.position(0);
+        if (floatAlpha != null && floatAlpha.length != 0) {
+            ByteBuffer v2 = ByteBuffer.allocateDirect(floatAlpha.length * 4);
+            if (v2 != null) {
+                v2.order(ByteOrder.nativeOrder());
+                floatBufferAlpha = v2.asFloatBuffer();
+            }
+            if (floatBufferAlpha != null) {
+                floatBufferAlpha.put(floatAlpha);
+                floatBufferAlpha.position(0);
+            }
         }
 
-        ByteBuffer v1 = ByteBuffer.allocateDirect(floatRgb.length * 4);
-        if (v1 != null) {
-            v1.order(ByteOrder.nativeOrder());
-            floatBufferRgb = v1.asFloatBuffer();
-        }
-        if (floatBufferRgb != null) {
-            floatBufferRgb.put(floatRgb);
-            floatBufferRgb.position(0);
+        if (floatRgb != null && floatRgb.length != 0) {
+            ByteBuffer v1 = ByteBuffer.allocateDirect(floatRgb.length * 4);
+            if (v1 != null) {
+                v1.order(ByteOrder.nativeOrder());
+                floatBufferRgb = v1.asFloatBuffer();
+            }
+            if (floatBufferRgb != null) {
+                floatBufferRgb.put(floatRgb);
+                floatBufferRgb.position(0);
+            }
         }
 
 
