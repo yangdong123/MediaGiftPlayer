@@ -20,6 +20,6 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 #添加混淆代码
-#-keep class com.example.yangdong.mediagiftplayerlibrary.gift.view.GiftViewPlayer{ public *;}
-#-keep class com.example.yangdong.mediagiftplayerlibrary.gift.view.GiftViewPlayer$GiftViewPlayerInterface{ public *;}
-#-keep class com.example.yangdong.mediagiftplayerlibrary.gift.bean.GiftBean{ public *;}
+-keep class com.example.yangdong.mediagiftplayerlibrary.gift.view.GiftViewPlayer{ public *;}
+-keep class com.example.yangdong.mediagiftplayerlibrary.gift.view.GiftViewPlayer$GiftViewPlayerInterface{ public *;}
+-keep class com.example.yangdong.mediagiftplayerlibrary.gift.bean.GiftBean{ public *;}
