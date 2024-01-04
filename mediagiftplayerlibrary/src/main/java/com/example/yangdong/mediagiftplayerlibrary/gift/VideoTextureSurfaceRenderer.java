@@ -150,12 +150,13 @@ public class VideoTextureSurfaceRenderer extends TextureSurfaceRenderer implemen
         }
 
 
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glGenTextures(1, textures, 0);
-        checkGlError("Texture generate");
-
-        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textures[0]);
-        checkGlError("Texture bind");
+        if (textures != null) {
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+            GLES20.glGenTextures(1, textures, 0);
+            checkGlError("Texture generate");
+            GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textures[0]);
+            checkGlError("Texture bind");
+        }
 
 
     }
