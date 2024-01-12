@@ -2,62 +2,62 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 
-//引用地址 api 'com.yangdong.live_event_bus:liveeventbus:1.0'
-//def artifactory_url = "http://lede.mrdong.online:8081/artifactory"
-//def artifactory_username = "yangdong"
-//def artifactory_password = "yangdong123"
-//def artifactory_repoKey = "libs-release-local"
-//publishing {
-//    publications {
-//        aar(MavenPublication) {
-//            groupId "com.yangdong.live_event_bus"
-//            version "1.1"
-//            artifactId project.name
-//
-//            artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
-//
-//            pom.withXml {
-//                def root = asNode()
-//                def dependenciesNode = root.appendNode('dependencies')
-//                configurations.implementation.allDependencies.each {
-//                    println "----------" + it.group + it.name + it.version
-//                    if (it.name != 'unspecified' && it.group && it.name && it.version) {
-//                        def dependencyNode = dependenciesNode.appendNode('dependency')
-//                        dependencyNode.appendNode('groupId', it.group)
-//                        dependencyNode.appendNode('artifactId', it.name)
-//                        dependencyNode.appendNode('version', it.version)
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//artifactory {
-//    contextUrl = artifactory_url
-//    publish {
-//        repository {
-//            repoKey = artifactory_repoKey
-//
-//            username = artifactory_username
-//            password = artifactory_password
-//        }
-//        defaults {
-//            publications('aar')
-//            publishArtifacts = true
-//
-//            properties = ['qa.level': 'basic', 'q.os': 'android', 'dev.team': 'core']
-//            publishPom = true
-//        }
-//    }
-//}
-//
-//task aarReleasePublish {
-//
-//    doLast {
-//        println "打包上传执行完毕!"
-//    }
-//}
+//引用地址 api 'com.yangdong.mediagiftplayerlibrary:mediagiftplayerlibrary:1.1'
+def artifactory_url = "http://lede.mrdong.online:8081/artifactory"
+def artifactory_username = "yangdong"
+def artifactory_password = "yangdong123"
+def artifactory_repoKey = "libs-release-local"
+publishing {
+    publications {
+        aar(MavenPublication) {
+            groupId "com.yangdong.mediagiftplayerlibrary"
+            version "1.0"
+            artifactId project.name
+
+            artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
+
+            pom.withXml {
+                def root = asNode()
+                def dependenciesNode = root.appendNode('dependencies')
+                configurations.implementation.allDependencies.each {
+                    println "----------" + it.group + it.name + it.version
+                    if (it.name != 'unspecified' && it.group && it.name && it.version) {
+                        def dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('groupId', it.group)
+                        dependencyNode.appendNode('artifactId', it.name)
+                        dependencyNode.appendNode('version', it.version)
+                    }
+                }
+            }
+        }
+    }
+}
+
+artifactory {
+    contextUrl = artifactory_url
+    publish {
+        repository {
+            repoKey = artifactory_repoKey
+
+            username = artifactory_username
+            password = artifactory_password
+        }
+        defaults {
+            publications('aar')
+            publishArtifacts = true
+
+            properties = ['qa.level': 'basic', 'q.os': 'android', 'dev.team': 'core']
+            publishPom = true
+        }
+    }
+}
+
+task aarReleasePublish {
+
+    doLast {
+        println "打包上传执行完毕!"
+    }
+}
 
 android {
     compileSdkVersion 34

@@ -65,7 +65,13 @@ public class HardDecodePlayerActivity extends Activity implements View.OnClickLi
                 if (index > videoPaths.size()-1) {
                     index = 0;
                 }
-                giftView.play(videoPaths.get(index), 0, false, true, false, new GiftViewPlayer.GiftViewPlayerInterface() {
+                /**
+                 * @param videoPath  路劲
+                 * @param type       返回不同type
+                 * @param isAddFirst 是否加到队头
+                 * @param isResource 是否资源文件
+                 */
+                giftView.play(videoPaths.get(index), 0, false, true, true, new GiftViewPlayer.GiftViewPlayerInterface() {
                     @Override
                     public void onCompleted(GiftBean giftBean) {
 

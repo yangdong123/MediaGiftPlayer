@@ -12,11 +12,10 @@
         android:textSize="60dp"
         android:gravity="center"
         android:textColor="#ffffff"/>
-
-    <TextureView
-        android:id="@+id/id_textureview"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+    <com.example.yangdong.mediagiftplayerlibrary.gift.view.GiftViewPlayer
+        android:id="@+id/gift_player"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_centerInParent="true"/>
 
     <Button
@@ -31,5 +30,7 @@
         android:text="切换"
         android:textColor="#ffffff"
         android:textSize="10dp" />
+
+
 
 </RelativeLayout>

@@ -5,6 +5,10 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven {
+            allowInsecureProtocol = true
+            url = 'http://lede.mrdong.online:8081/artifactory/libs-release-local'
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.4.2'
@@ -22,6 +26,10 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven {
+            allowInsecureProtocol = true
+            url = 'http://lede.mrdong.online:8081/artifactory/libs-release-local'
+        }
     }
 }
 

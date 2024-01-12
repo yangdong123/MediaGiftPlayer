@@ -23,3 +23,4 @@
 -keep class com.example.yangdong.mediagiftplayerlibrary.gift.view.GiftViewPlayer{ public *;}
 -keep class com.example.yangdong.mediagiftplayerlibrary.gift.view.GiftViewPlayer$GiftViewPlayerInterface{ public *;}
 -keep class com.example.yangdong.mediagiftplayerlibrary.gift.bean.GiftBean{ public *;}
+-keep class com.example.yangdong.mediagiftplayerlibrary.gift.utils.FileUtil{ public *;}
