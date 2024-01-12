@@ -9,11 +9,12 @@ import android.media.MediaFormat;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
+
+import androidx.annotation.RequiresApi;
 
 import com.example.yangdong.mediagiftplayerlibrary.gift.VideoTextureSurfaceRenderer;
 
@@ -22,8 +23,6 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by MrDong on 2019/2/11.

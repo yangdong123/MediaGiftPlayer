@@ -4,21 +4,16 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.PermissionChecker;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.PermissionChecker;
+
 import com.example.yangdong.mediagiftplayer.harddecode.HardDecodePlayerActivity;
 import com.example.yangdong.mediagiftplayer.playvideo.TextureViewMediaActivity;
-import com.example.yangdong.mediagiftplayerlibrary.gift.utils.FileUtil;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
