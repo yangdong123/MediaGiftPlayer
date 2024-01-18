@@ -282,6 +282,9 @@ public class VideoTextureSurfaceRenderer extends TextureSurfaceRenderer implemen
 
     //纹理映射过滤
     private void initTextureMapFilter() {
+        if(textures == null) {
+            textures = new int[4];
+        }
         GLES20.glGenTextures(4, textures, 0);
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textures[0]);
         GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_REPEAT);
