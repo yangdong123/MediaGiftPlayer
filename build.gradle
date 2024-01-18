@@ -9,6 +9,10 @@ buildscript {
             allowInsecureProtocol = true
             url = 'http://lede.mrdong.online:8081/artifactory/libs-release-local'
         }
+        maven {
+            allowInsecureProtocol = true
+            url "http://artifactory.dev.qie.tv:8081/artifactory/libs-release-local"
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.4.2'
@@ -29,6 +33,10 @@ allprojects {
         maven {
             allowInsecureProtocol = true
             url = 'http://lede.mrdong.online:8081/artifactory/libs-release-local'
+        }
+        maven {
+            allowInsecureProtocol = true
+            url "http://artifactory.dev.qie.tv:8081/artifactory/libs-release-local"
         }
     }
 }
