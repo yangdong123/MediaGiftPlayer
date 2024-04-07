@@ -195,7 +195,9 @@ public class VideoTextureSurfaceRenderer extends TextureSurfaceRenderer implemen
 
         GLES20.glUseProgram(shaderProgram);
         GLES20.glEnableVertexAttribArray(vPosition);
-        GLES20.glVertexAttribPointer(vPosition, 2, GLES20.GL_FLOAT, false, 0, vertexBuffer);
+        if (vertexBuffer != null && vertexBuffer.hasRemaining()) {
+            GLES20.glVertexAttribPointer(vPosition, 2, GLES20.GL_FLOAT, false, 0, vertexBuffer);
+        }
         GLES20.glUniform1i(isYUV, 0);
         if (!arg8) {
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
@@ -205,9 +207,13 @@ public class VideoTextureSurfaceRenderer extends TextureSurfaceRenderer implemen
 
         bindAndActiveTexture();
         GLES20.glEnableVertexAttribArray(vTexCoordinateAlpha);
-        GLES20.glVertexAttribPointer(vTexCoordinateAlpha, 4, GLES20.GL_FLOAT, false, 0, floatBufferAlpha);
+        if (floatBufferAlpha != null && floatBufferAlpha.hasRemaining()) {
+            GLES20.glVertexAttribPointer(vTexCoordinateAlpha, 4, GLES20.GL_FLOAT, false, 0, floatBufferAlpha);
+        }
         GLES20.glEnableVertexAttribArray(vTexCoordinateRgb);
-        GLES20.glVertexAttribPointer(vTexCoordinateRgb, 4, GLES20.GL_FLOAT, false, 0, floatBufferRgb);
+        if (floatBufferRgb != null && floatBufferRgb.hasRemaining()) {
+            GLES20.glVertexAttribPointer(vTexCoordinateRgb, 4, GLES20.GL_FLOAT, false, 0, floatBufferRgb);
+        }
         GLES20.glDrawElements(5, drawOrder.length, GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
         GLES20.glDisableVertexAttribArray(vPosition);
         GLES20.glDisableVertexAttribArray(vTexCoordinateAlpha);
@@ -282,7 +288,7 @@ public class VideoTextureSurfaceRenderer extends TextureSurfaceRenderer implemen
 
     //纹理映射过滤
     private void initTextureMapFilter() {
-        if(textures == null) {
+        if (textures == null) {
             textures = new int[4];
         }
         GLES20.glGenTextures(4, textures, 0);
